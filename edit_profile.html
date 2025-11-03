@@ -9,7 +9,6 @@
 </head>
 
 <body>
-  <!-- ✅ Header 区，与 user.html 一致 -->
   <header class="container nav">
     <a class="brand" href="index.html">
       <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
@@ -24,33 +23,21 @@
     </nav>
   </header>
 
-  <!-- ✅ 主体 -->
   <main class="container">
-    <div class="profile-card" style="max-width:400px;margin:auto;">
+    <div class="profile-card" style="max-width:500px;margin: 50px auto;">
       <h2 data-i18n-key="edit_profile_heading" style="margin-bottom:10px;">Edit Your Profile</h2>
       <p data-i18n-key="edit_profile_description" style="color:#666;margin-bottom:20px;">
         Update your username, email, or password below.
       </p>
 
-      <!-- ✅ 编辑表单 -->
-      <form id="editForm" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:14px;">
-        <label>
-          <span data-i18n-key="username_label">Username:</span>
-          <input type="text" id="editUsername" name="username" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-        </label>
+      <div class="avatar-preview-box">
+        <img id="editAvatarPreview" src="assets/images/user-icon.png" alt="Avatar Preview" class="avatar-preview">
+      </div>
 
+      <form id="editForm" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:14px; text-align: left;">
+        
         <label>
-          <span data-i18n-key="email_label">Email:</span>
-          <input type="email" id="editEmail" name="email" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-        </label>
-
-        <label>
-          <span data-i18n-key="password_label">New Password:</span>
-          <input type="password" id="editPassword" name="password" placeholder="Leave blank to keep current password" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
-        </label>
-
-        <div class="custom-file">
-          <label for="editAvatar" data-i18n-key="avatar_label">Profile Picture:</label>
+          <span data-i18n-key="avatar_label">Profile Picture:</span>
           <div class="file-box"
               style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;
                       display:flex;align-items:center;gap:10px;background-color:#fff;">
@@ -62,7 +49,22 @@
               No file chosen
             </span>
           </div>
-        </div>
+        </label>
+        
+        <label>
+          <span data-i18n-key="username_label">Username:</span>
+          <input type="text" id="editUsername" name="username" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
+
+        <label>
+          <span data-i18n-key="email_label">Email:</span>
+          <input type="email" id="editEmail" name="email" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
+
+        <label>
+          <span data-i18n-key="new_password_label">New Password:</span>
+          <input type="password" id="editPassword" name="password" data-i18n-placeholder="password_placeholder" placeholder="Leave blank to keep current password" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
 
         <div style="display:flex;justify-content:space-between;gap:10px;margin-top:10px;">
           <button type="submit" 
@@ -80,15 +82,32 @@
           </a>
         </div>
       </form>
+
+      
+      <div class="danger-zone">
+        <h3 data-i18n-key="danger_zone">Danger Zone</h3>
+        <p data-i18n-key="danger_zone_desc">
+          Deleting your account is permanent and cannot be undone.
+        </p>
+        <button id="deleteAccountBtn" class="btn btn-danger" data-i18n-key="delete_account_button_long">
+          Delete This Account
+        </button>
+      </div>
+
     </div>
   </main>
 
-  <!-- ✅ JS 逻辑 -->
+  
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     // 获取语言
     const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
     if (typeof applyTranslations === 'function') applyTranslations(lang);
+
+    const fileInput = document.getElementById('editAvatar');
+    const customBtn = document.getElementById('customFileBtn');
+    const fileName = document.getElementById('fileName');
+    const avatarPreview = document.getElementById('editAvatarPreview');
 
     // === 1️⃣ 获取用户信息 ===
     fetch('session_check.php')
@@ -98,13 +117,15 @@
         const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
 
         if (data.logged_in) {
-        console.log(data.username, data.email);
-        // ✅ 改成正确的 input ID
-        document.getElementById('editUsername').value = data.username || '';
-        document.getElementById('editEmail').value = data.email || '';
+          document.getElementById('editUsername').value = data.username || '';
+          document.getElementById('editEmail').value = data.email || '';
+          // 设置当前头像预览
+          avatarPreview.src = data.avatar && data.avatar.trim() !== '' 
+            ? data.avatar 
+            : 'assets/images/user-icon.png';
         } else {
-        alert(tDict.alert_login_first || 'Please log in first.');
-        window.location.href = 'login.html';
+          alert(tDict.alert_login_first || 'Please log in first.');
+          window.location.href = 'login.html';
         }
     })
     .catch(err => {
@@ -114,34 +135,44 @@
         alert(tDict.alert_load_profile_error || 'Error loading profile.');
     });
 
-    // === 自定义文件选择按钮逻辑 ===
-    const fileInput = document.getElementById('editAvatar');
-    const customBtn = document.getElementById('customFileBtn');
-    const fileName = document.getElementById('fileName');
-
+    // === 2️⃣ 自定义文件选择按钮逻辑 (带预览) ===
     customBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
       const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
-      const tDict = translations[lang] || translations.en;
+      const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+
       if (fileInput.files.length > 0) {
-        fileName.textContent = fileInput.files[0].name;
+        const file = fileInput.files[0];
+        fileName.textContent = file.name;
+        
+        // 读取文件并在
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          avatarPreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        
       } else {
-        fileName.textContent = tDict.no_file_chosen;
+        fileName.textContent = tDict.no_file_chosen || 'No file chosen';
+        // 如果取消选择，恢复成 session 加载的头像
+        fetch('session_check.php').then(res => res.json()).then(data => {
+            if(data.logged_in) avatarPreview.src = data.avatar || 'assets/images/user-icon.png';
+        });
       }
     });
 
-    // === 2️⃣ 表单提交处理 ===
+    // === 3️⃣ 表单提交处理 ===
     const form = document.getElementById('editForm');
     form.addEventListener('submit', e => {
-    e.preventDefault();
-    const formData = new FormData(form);
+      e.preventDefault();
+      const formData = new FormData(form);
 
-    fetch('update_profile.php', {
-        method: 'POST',
-        body: formData
-    })
-        .then(res => res.json())
-        .then(result => {
+      fetch('update_profile.php', {
+          method: 'POST',
+          body: formData
+      })
+      .then(res => res.json())
+      .then(result => {
         const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
         const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
 
@@ -149,16 +180,82 @@
             alert(tDict.alert_update_success || 'Profile updated successfully!');
             window.location.href = 'user.html';
         } else {
-            alert(result.message || tDict.alert_update_failed || 'Update failed.');
+            // 从 i18n.js 获取翻译后的错误
+            const errorKey = result.messageKey || 'alert_update_failed';
+            alert(tDict[errorKey] || result.message || tDict.alert_update_failed || 'Update failed.');
         }
-        })
-        .catch(err => {
+      })
+      .catch(err => {
         console.error('Error updating profile:', err);
         const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
         const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
         alert(tDict.alert_update_error || 'Error updating profile.');
-        });
+      });
     });
+
+    // === 4️⃣ 【【 新增：删除按钮的事件处理 (从 user.html 移入) 】】】 ===
+    const deleteBtn = document.getElementById('deleteAccountBtn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', () => {
+        // 1. 获取翻译后的提示文本
+        const currentLang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const currentTranslations = (typeof translations !== 'undefined' && translations[currentLang]) ? translations[currentLang] : {};
+        
+        const confirmMsg1 = currentTranslations.delete_confirm_1 || 'Are you sure you want to delete your account? This action cannot be undone.';
+        const promptMsg = currentTranslations.delete_prompt_password || 'To confirm deletion, please enter your password:';
+        const confirmMsg2 = currentTranslations.delete_confirm_2 || 'FINAL CONFIRMATION: Delete account permanently?';
+        const cancelMsg = currentTranslations.delete_cancelled || 'Account deletion cancelled.';
+        const errorMsg = currentTranslations.delete_error_generic || 'An error occurred. Please try again.';
+
+        // 2. 第一次确认
+        if (!confirm(confirmMsg1)) {
+          alert(cancelMsg);
+          return;
+        }
+
+        // 3. 弹出输入框要求输入密码
+        const password = prompt(promptMsg);
+
+        // 4. 如果用户取消输入或没输入密码
+        if (password === null || password.trim() === '') {
+          alert(cancelMsg);
+          return;
+        }
+        
+        // 5. 第二次确认 (更强烈的警告)
+        if (!confirm(confirmMsg2)) {
+            alert(cancelMsg);
+            return;
+        }
+
+        // 6. 发送请求到后端 PHP
+        fetch('delete_account.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.json())
+        .then(result => {
+          // 7. 处理 PHP 返回的结果
+          if (result.success) {
+            // 删除成功，跳转 (PHP会返回 index.html?status=delete_success)
+            window.location.href = result.redirectUrl || 'index.html?status=delete_success';
+          } else {
+            // 删除失败，弹出 PHP 返回的错误消息
+            const errorKey = result.messageKey || 'delete_error_generic';
+            const errorMessage = currentTranslations[errorKey] || errorMsg;
+            alert(errorMessage);
+          }
+        })
+        .catch(err => {
+          console.error('Delete account failed:', err);
+          alert(errorMsg); // 网络或其他错误
+        });
+      });
+    }
+
 });
   </script>
 </body>

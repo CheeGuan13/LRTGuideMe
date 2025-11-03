@@ -46,8 +46,8 @@ let currentSelectedPoi = null;
 // The route type chosen by the user: 'escalator', 'elevator', 'accessible', or
 // null if none selected. This affects which connections are preferred when
 // computing a route.
-// MODIFIED: [FIX 2] Set to null. No route is active by default on load.
-let selectedRouteType = null;
+// MODIFIED: Default to 'escalator' per user request.
+let selectedRouteType = 'escalator';
 
 // The ID of the start POI, taken from the "I am at" dropdown. Only used when
 // computing routes.
@@ -64,6 +64,10 @@ let dynamicRouteEl = null;
 // containing the list of points for that portion of the route. This allows
 // switching between levels without recomputing the route.
 let dynamicRoutes = {};
+
+// 【【【 优化点 1：新增 】】】
+// 用于存储当前的缩放实例
+let currentPanZoomInstance = null;
 
 /* ---------- Colour palette ---------- */
 // Default colours for different POI types. These can be overridden by
@@ -249,12 +253,11 @@ function computeCrossLevelRoute(start, end, startLevel, destLevel, routeType) {
 
   if (!levelCandidates.length) return null; // 没有任何跨层连接
 
-  // 1. 根据用户选择，决定实际要用的连接类型
-  // 'routeType' can be null on first run, default to 'escalator'
+  // 1. 根据用户选择和起点，决定实际要用的连接类型
   let typeToUse = routeType || 'escalator'; // 默认为扶梯
 
-  // 您的新逻辑：无障碍路线 (accessible) 始终等同于电梯 (elevator) 路线
-  if (typeToUse === 'accessible') {
+  // 您的逻辑：无障碍路线(accessible)与电梯(elevator)一致，除非起点是 Ramp (type 'accessible')
+  if (typeToUse === 'accessible' && start.type !== 'accessible') {
     typeToUse = 'elevator';
   }
 
@@ -502,6 +505,13 @@ function populateImAtOptions(){
 }
 
 function renderMap(){
+  // 【【【 优化点 2：新增 】】】
+  // 开始渲染前，先销毁旧的缩放实例
+  if (currentPanZoomInstance) {
+    currentPanZoomInstance.destroy();
+    currentPanZoomInstance = null;
+  }
+  
   if (!assertStationDataOrShowError() || !mapCanvas) return;
 
   const ctx = getCurrentLevelObj();
@@ -520,16 +530,10 @@ function renderMap(){
   svg.setAttribute('viewBox','0 0 1000 540');
 
   // =================================================================
-  // 【【【 优化点 1：已还原 】】】
+  // 【【【 优化点 3：还原 】】】
   //
-  //   我们把它改回 100%，让桌面端可以自动缩放
-  //   移动端的平移功能将由 CSS (@media) 来强制实现
+  //   我们把它改回 100%，让 svg-pan-zoom 库来处理缩放
   //
-  //   原代码 (上一个版本):
-  //   svg.setAttribute('width','1000');
-  //   svg.setAttribute('height','540');
-  //
-  //   修改后 (还原):
   svg.setAttribute('width','100%');
   svg.setAttribute('height','100%');
   // =================================================================
@@ -576,14 +580,11 @@ function renderMap(){
     poly.setAttribute('class','route-line');
     poly.setAttribute('points', dynPts.map(pt => `${pt.x},${pt.y}`).join(' '));
     poly.setAttribute('fill','none');
-    
-    // Use routeType from calculation, fallback to blue
-    let col = '#1d4ed8'; // Default blue
-    // selectedRouteType might be null, but the button highlight is handled by calculateAndDrawRoute
+    // 根据所选路线类型着色
+    let col = '#e11d48';
     if (selectedRouteType === 'escalator') col = '#1d4ed8';
     else if (selectedRouteType === 'elevator') col = '#6366f1';
-    else if (selectedRouteType === 'accessible') col = '#6366f1'; // Per request, accessible = elevator
-    
+    else if (selectedRouteType === 'accessible') col = '#0ea5e9';
     poly.setAttribute('stroke', col);
     poly.setAttribute('stroke-width','6');
     poly.setAttribute('stroke-linecap','round');
@@ -662,7 +663,34 @@ function renderMap(){
   });
 
   mapCanvas.appendChild(svg);
-}
+  
+  // =================================================================
+  // 【【【 优化点 4：新增 】】】
+  //
+  //   使用 svg-pan-zoom 库激活这个 SVG
+  //
+  // 确保在激活前 SVG 已经完全渲染并有尺寸
+  setTimeout(() => {
+    // 检查 svg 是否还在DOM中 (防止用户在0.1秒内切换了楼层)
+    if (document.getElementById("mapCanvas")?.contains(svg)) { 
+      currentPanZoomInstance = svgPanZoom(svg, {
+        panEnabled: true,            // 允许平移
+        zoomEnabled: true,           // 允许缩放 (包括鼠标滚轮和双指缩放)
+        controlIconsEnabled: false,  // 不显示 +/- 按钮 (保持界面干净)
+        fit: true,                   // 初始加载时自动适应容器
+        center: true,                // 初始加载时居中
+        minZoom: 0.7,                // 最小缩放级别 (允许缩小一点)
+        maxZoom: 5,                  // 最大缩放级别 (允许放大5倍)
+        zoomScaleSensitivity: 0.3,   // 缩放灵敏度
+        
+        // [重要] 防止库和你的POI点击事件冲突
+        preventMouseEventsDefault: false 
+      });
+    }
+  }, 100); // 延迟 100毫秒
+  // =================================================================
+
+} // 这是 renderMap() 函数的结束括号
 
 /* ---------- 重绘 ---------- */
 function rerender(){
@@ -691,10 +719,6 @@ function setActive(list, el){
   if (el && el.classList) el.classList.add('active');
 }
 
-/**
- * 核心函数：计算并绘制从起点到终点的路线。
- * 它处理同层和跨层，并更新信息面板。
- */
 async function calculateAndDrawRoute() {
   // 1. 检查是否选了终点
   if (!currentSelectedPoi) {
@@ -720,6 +744,7 @@ async function calculateAndDrawRoute() {
   let startPoi = null;
   let startLvKey = null;
   for (const lvKey of Object.keys(station.levels || {})) {
+    // 【【【 修复：使用 __originalPois 】】】
     const arr = (station.levels[lvKey].__originalPois || station.levels[lvKey].pois) || [];
     const found = arr.find(p => p.id === currentStartPoiId);
     if (found) {
@@ -757,16 +782,12 @@ async function calculateAndDrawRoute() {
     const routePts = computeSimpleRoute(startPoi, targetPoi, destLvKey);
     dynamicRoutes[destLvKey] = routePts;
     steps = generateSteps(routePts, targetPoi.name);
-    
     // 您的需求：同层时，清除路线类型高亮
     navScope.querySelectorAll('[data-route]').forEach(b=>b.classList.remove('active'));
-    // Also reset the state variable
-    selectedRouteType = null;
 
   } else {
     // 跨层导航
     // (startPoi 包含 type, 用于 Ramp 判断)
-    // 'selectedRouteType' may be null here, computeCrossLevelRoute will default to 'escalator'
     const cross = computeCrossLevelRoute(startPoi, targetPoi, startLvKey, destLvKey, selectedRouteType);
     
     if (!cross) {
@@ -779,18 +800,9 @@ async function calculateAndDrawRoute() {
       return;
     }
 
-    // MODIFIED: [FIX 1]
-    // 只有在用户 *没有* 选择路线时 (selectedRouteType === null)，
-    // (例如：用户第一次点击 "Get Directions")，
-    // 我们才用计算出的类型 (cross.connType) 来更新UI和状态。
-    if (selectedRouteType === null) {
-        selectedRouteType = cross.connType;
-        setActive([...navScope.querySelectorAll('[data-route]')], navScope.querySelector(`[data-route="${cross.connType}"]`));
-    }
-    // 如果用户 *已经* 点击了 "accessible" 或 "elevator" (selectedRouteType != null),
-    // 那么 bindUI 已经设置了高亮，我们 *不会* 覆盖它。
-    // "accessible" 按钮将保持高亮，即使用户被引导至电梯。
-
+    // 您的需求：高亮实际使用的路线按钮
+    setActive([...navScope.querySelectorAll('[data-route]')], navScope.querySelector(`[data-route="${cross.connType}"]`));
+    selectedRouteType = cross.connType; // 同步状态
 
     dynamicRoutes[startLvKey] = cross.startPath;
     dynamicRoutes[destLvKey]  = cross.destPath;
@@ -821,12 +833,24 @@ async function calculateAndDrawRoute() {
   const baseOnly = infoBody.innerHTML.split('<hr')[0] || infoBody.innerHTML;
   const lang = window.currentLang || 'en';
   const dirLabel = (window.translations?.[lang]?.directions) || 'Directions';
+  
+  // 【【【 新增：AR 视图按钮 】】】
+  const arBtnLabel = (window.translations?.[lang]?.ar_view_mockup) || 'AR View (Mock-up)';
+  const arButtonHtml = `
+    <div style="text-align: center; margin-top: 15px;">
+      <a href="ar_mockup.html" class="btn primary small">
+        ${arBtnLabel}
+      </a>
+    </div>
+  `;
+
   infoBody.innerHTML = baseOnly + `
     <hr/>
     <div><strong>${dirLabel}</strong></div>
     <ol style="margin:6px 0;padding-left:18px;">
       ${translatedSteps.map(s => `<li>${s}</li>`).join('')}
     </ol>
+    ${arButtonHtml}
   `;
 }
 
@@ -845,7 +869,7 @@ function bindUI(){
     const g = findBtnByText(lvlScope, 'Ground Floor');
     const p = findBtnByText(lvlScope, 'Platform Level');
     if (g) g.dataset.level = 'L1';
-    if (p) p.dataset.level = 'L2';
+    if (p) g.dataset.level = 'L2';
     levelBtns = [g,p].filter(Boolean);
   }
   lvlScope.addEventListener('click', (e)=>{
@@ -871,24 +895,16 @@ function bindUI(){
   ensureNavBtn('Accessible Route','accessible');
 
   navScope.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-route]');
-    if (!btn) return;
-    const type = btn.dataset.route;
+    const btn = e.target.closest('[data-route]');
+    if (!btn) return;
+    const type = btn.dataset.route;
 
     // 如果点击的已经是当前激活的类型，则不执行任何操作
-    // (MODIFIED: [FIX 1] Removed the 'active' check to allow re-calculation)
-    if (selectedRouteType === type) {
-        // If it's already selected, re-run the calculation
-        // in case the start/end points changed.
-        if (currentStartPoiId && currentSelectedPoi) {
-             calculateAndDrawRoute();
-        }
-        return;
-    }
-    
-    selectedRouteType = type;
-    setActive([...navScope.querySelectorAll('[data-route]')], btn);
-    
+    if (selectedRouteType === type && btn.classList.contains('active')) return;
+    
+    selectedRouteType = type;
+    setActive([...navScope.querySelectorAll('[data-route]')], btn);
+    
     // === 核心修改 ===
     // 检查是否已经有起点和终点 (即路线正在显示中)
     if (currentStartPoiId && currentSelectedPoi) {
@@ -900,7 +916,7 @@ function bindUI(){
       dynamicRoutes = {};
       rerender(); 
     }
-  });
+  });
 
   /* 过滤器 */
   document.querySelectorAll('.type-filter').forEach(cb=>{
@@ -915,7 +931,15 @@ function bindUI(){
   let resizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(rerender, 120);
+    
+    // 【【【 优化点 5：修改 】】】
+    // 窗口调整大小时，让 pan-zoom 实例也刷新
+    if (currentPanZoomInstance) {
+      currentPanZoomInstance.resize();
+      currentPanZoomInstance.center();
+    }
+    // (不再使用 rerender, 因为它在缩放时体验不好)
+    // resizeTimer = setTimeout(rerender, 120);
   });
 }
 
@@ -927,6 +951,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     currentStation = 'KL Sentral';
     localStorage.setItem('currentStation', currentStation);
   }
+  
+  // 确保在访问 STATION_MAPS 之前，原始 POI 列表被备份
+  if (STATION_MAPS[currentStation] && STATION_MAPS[currentStation].levels) {
+    Object.values(STATION_MAPS[currentStation].levels).forEach(lv => {
+      if (Array.isArray(lv.pois) && !lv.__originalPois) {
+        lv.__originalPois = lv.pois.slice();
+      }
+    });
+  }
+
   // If the selected station has no map data, display a "coming soon" message instead of
   // falling back to another map. We use the translation dictionary to show the
   // message in the current language. After showing the message, we stop further
@@ -988,8 +1022,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
                   || findBtnByText(lvlScope, currentLevel === 'L2' ? 'Platform Level' : 'Ground Floor');
   if (curLvlBtn) setActive([...lvlScope.querySelectorAll('[data-level]')], curLvlBtn);
 
-  // MODIFIED: [FIX 2] Deleted the block that highlights the default route type on load.
-  // Route type buttons are not highlighted by default anymore.
+  // MODIFIED: Always highlight the default selected route type on load
+  if (selectedRouteType) {
+    const navScope = document.querySelector('.navigation-type') || document;
+    const curRouteBtn = navScope.querySelector(`[data-route="${selectedRouteType}"]`);
+    if (curRouteBtn) setActive([...navScope.querySelectorAll('[data-route]')], curRouteBtn);
+  }
 
   // 5) 绑定事件
   bindUI();

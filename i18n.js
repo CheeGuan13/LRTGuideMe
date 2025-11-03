@@ -87,27 +87,21 @@ const translations = {
     facilities: 'Facilities:',
     navigate_in_station: 'Navigate in station',
     
-    // --- (English Source Text) ---
     klcc_p1: 'KLCC is home to the iconic <b>Petronas Twin Towers</b>, among the tallest twin structures in the world. This landmark has become a symbol of Malaysia’s rapid development and modern cityscape.',
     klcc_p2: 'Surrounding the towers is <b>Suria KLCC</b>, a premier shopping mall offering luxury brands, diverse dining, and an excellent cinema experience. KLCC Park provides a scenic green escape with jogging paths, fountains, and a playground, making it a popular destination for both locals and tourists. Visitors can also explore <b>Aquaria KLCC</b>, one of Southeast Asia’s leading oceanariums.',
     klcc_station_p: 'KLCC Station directly connects passengers to the heart of Kuala Lumpur’s commercial district. It is designed for high accessibility, with escalators and lifts that cater to visitors of all needs. The station is strategically located underground, providing sheltered access to major attractions and seamless integration with surrounding shopping and business areas.',
-    
     bukit_p1: 'Bukit Bintang is the beating heart of Kuala Lumpur’s “Golden Triangle”, a lively district famous for shopping, dining, and entertainment. The area is home to world-class malls such as Pavilion Kuala Lumpur, Fahrenheit88, and Lot 10, making it the city’s fashion and retail hub. At night, the streets transform with neon lights, rooftop bars, and bustling nightclubs.',
     bukit_p2: 'Just steps away lies Jalan Alor, a street food haven that attracts locals and tourists alike with its grilled seafood, satay, and tropical desserts. Whether you’re searching for luxury brands, vibrant nightlife, or authentic Malaysian flavors, Bukit Bintang offers a unique blend of modern city energy and traditional charm.',
     bukit_station_p: 'Masjid Jamek Station is one of the busiest and most important interchange stations in Kuala Lumpur. It directly connects three major LRT lines – Kelana Jaya, Sri Petaling, and Ampang – allowing seamless transfers across the city. The station is located just steps away from the mosque and other heritage landmarks, making it a convenient hub for both commuters and tourists.',
-    
     petaling_p1: 'Petaling Street, also known as Chinatown Kuala Lumpur, is one of the city’s most iconic and historic districts. It is a lively marketplace filled with countless stalls selling everything from clothes, accessories, and souvenirs to traditional Chinese herbs and street food. Visitors can enjoy bargaining with vendors while experiencing the vibrant atmosphere that reflects the multicultural spirit of Kuala Lumpur.',
     petaling_p2: 'At night, the area transforms into a colorful bazaar, with glowing lanterns lighting up the streets and food stalls offering local delicacies such as wantan mee, claypot chicken rice, and famous herbal teas. Beyond shopping and dining, the area is also home to several temples and heritage buildings that showcase the historical importance of the Chinese community in Malaysia.',
     petaling_station_p: 'The station itself is designed for accessibility and comfort. It features escalators, elevators, and clear signages to guide travelers smoothly. Its underground layout also provides shelter from weather conditions, making it ideal for visitors who plan to explore the city on foot. Nearby facilities include food courts, convenience stores, and cultural spaces, ensuring that passengers have everything they need as soon as they step out.',
-    
     central_market_p1: 'Central Market (Pasar Seni) is a cultural landmark in the heart of Kuala Lumpur, originally established as a wet market in the early 20th century and later transformed into a heritage centre for Malaysian arts and crafts. Today it is a vibrant hub where visitors can discover traditional batik, hand-made souvenirs, local artworks, and performances that celebrate Malaysia’s multicultural heritage.',
     central_market_p2: 'The market’s covered arcade is home to dozens of stalls and boutique shops, showcasing skilled artisans and designers. In addition to shopping, Central Market frequently hosts cultural events, craft workshops and small exhibitions that provide an authentic taste of Malaysian culture. It’s a favourite stop for visitors who want to buy locally-made keepsakes and experience the city’s artistic side.',
     central_market_station_p: 'The station itself is designed for accessibility and comfort. It features escalators, elevators, and clear signages to guide travelers smoothly. Its underground layout also provides shelter from weather conditions, making it ideal for visitors who plan to explore the city on foot. Nearby facilities include food courts, convenience stores, and cultural spaces, ensuring that passengers have everything they need as soon as they step out.',
-    
     titiwangsa_p1: 'Titiwangsa is a popular recreational destination in Kuala Lumpur, best known for the expansive <b>Titiwangsa Lake Gardens</b>. The park offers jogging tracks, cycling paths, boating activities, and open green spaces for families to relax. It is also home to <b>Istana Budaya (National Theatre)</b> and the <b>National Art Gallery</b>, making it a cultural hub that blends nature with art and performance.',
     titiwangsa_p2: 'The area is a favorite among both locals and tourists, providing a peaceful retreat from the bustling city center while still being easily accessible by public transport.',
     titiwangsa_station_p: 'Titiwangsa Station directly connects passengers to one of Kuala Lumpur’s most vibrant recreational areas. It is designed for accessibility and convenience, with modern facilities that make traveling comfortable for all visitors. From the station, passengers can easily reach the lake gardens, cultural landmarks, and green spaces that define the Titiwangsa district.',
-    
     bird_park_p1: 'KL Bird Park is one of the largest free-flight aviaries in the world, home to thousands of birds from around the globe. Visitors can enjoy up-close encounters with exotic species, interactive feeding sessions, and educational exhibits focused on avian conservation.',
     bird_park_p2: 'Easily accessible via LRT, KL Bird Park provides a serene escape from the city bustle while offering a fun and educational experience for families, tourists, and bird enthusiasts.',
     bird_station_p: 'The station itself is designed for accessibility and comfort. It features escalators, elevators, and clear signages to guide travelers smoothly. Its underground layout also provides shelter from weather conditions, making it ideal for visitors who plan to explore the city on foot. Nearby facilities include food courts, convenience stores, and cultural spaces, ensuring that passengers have everything they need as soon as they step out.',
@@ -140,8 +134,9 @@ const translations = {
     delete_error_generic: 'An error occurred. Please try again.',
     delete_error_not_logged_in: 'You must be logged in to delete your account.',
     delete_error_password: 'Password incorrect. Account not deleted.',
-
-    // --- Edit Profile Page ---
+    
+    // --- 【【 翻译添加在这里 】】 ---
+    edit_profile_title: 'LRT GuideMe – Edit Profile',
     edit_profile_button:'Edit',
     edit_profile_heading: 'Edit Your Profile',
     edit_profile_description: 'Update your username, email, or password below.',
@@ -155,7 +150,11 @@ const translations = {
     avatar_label: "Profile Picture:",
     choose_file_btn: "Choose File",
     no_file_chosen: "No file chosen",
-
+    password_placeholder: "Leave blank to keep current password",
+    danger_zone: "Danger Zone",
+    danger_zone_desc: "Deleting your account is permanent and cannot be undone.",
+    delete_account_button_long: "Delete This Account",
+    
     // --- Admin Page ---
     welcome_admin: 'Welcome, {name}!',
     admin_dashboard_title: 'Admin Dashboard',
@@ -252,27 +251,21 @@ const translations = {
     facilities: 'Kemudahan:',
     navigate_in_station: 'Navigasi dalam stesen',
 
-    // --- (Malay Translations) ---
     klcc_p1: 'KLCC menempatkan <b>Menara Berkembar Petronas</b> yang ikonik, antara struktur berkembar tertinggi di dunia. Mercu tanda ini telah menjadi simbol pembangunan pesat Malaysia dan landskap bandar moden.',
     klcc_p2: 'Di sekitar menara terdapat <b>Suria KLCC</b>, sebuah pusat beli-belah terkemuka yang menawarkan jenama mewah, pelbagai pilihan tempat makan, dan pengalaman panggung wayang yang hebat. Taman KLCC menyediakan kehijauan yang indah dengan laluan joging, air pancut, dan taman permainan, menjadikannya destinasi popular untuk penduduk tempatan dan pelancong. Pengunjung juga boleh menerokai <b>Aquaria KLCC</b>, salah satu akuarium terkemuka di Asia Tenggara.',
     klcc_station_p: 'Stesen KLCC menghubungkan penumpang terus ke pusat daerah komersial Kuala Lumpur. Ia direka untuk aksesibiliti tinggi, dengan eskalator dan lif untuk memenuhi semua keperluan pengunjung. Stesen ini terletak secara strategik di bawah tanah, menyediakan akses terlindung ke tarikan utama dan integrasi lancar dengan kawasan membeli-belah dan perniagaan sekitarnya.',
-    
     bukit_p1: 'Bukit Bintang ialah nadi “Segitiga Emas” Kuala Lumpur, sebuah daerah meriah yang terkenal dengan pusat beli-belah, tempat makan dan hiburan. Kawasan ini menempatkan pusat beli-belah bertaraf dunia seperti Pavilion Kuala Lumpur, Fahrenheit88, dan Lot 10, menjadikannya hab fesyen dan runcit di bandar ini. Pada waktu malam, jalan-jalan berubah dengan lampu neon, bar atas bumbung, dan kelab malam yang sibuk.',
     bukit_p2: 'Tidak jauh dari situ terdapat Jalan Alor, syurga makanan jalanan yang menarik penduduk tempatan dan pelancong dengan makanan laut bakar, sate, dan pencuci mulut tropika. Sama ada anda mencari jenama mewah, hiburan malam yang meriah, atau perisa asli Malaysia, Bukit Bintang menawarkan gabungan unik tenaga bandar moden dan pesona tradisional.',
     bukit_station_p: 'Stesen Masjid Jamek adalah salah satu stesen pertukaran yang paling sibuk dan penting di Kuala Lumpur. Ia menghubungkan tiga laluan LRT utama – Kelana Jaya, Sri Petaling, dan Ampang – membolehkan pertukaran yang lancar di seluruh bandar. Stesen ini terletak hanya beberapa langkah dari masjid dan mercu tanda warisan lain, menjadikannya hab yang mudah untuk penumpang dan pelancong.',
-    
     petaling_p1: 'Jalan Petaling, juga dikenali sebagai Chinatown Kuala Lumpur, adalah salah satu daerah paling ikonik dan bersejarah di bandar ini. Ia merupakan pasar yang meriah dipenuhi dengan gerai-gerai yang menjual segala-galanya daripada pakaian, aksesori, dan cenderamata hinggalah herba tradisional Cina dan makanan jalanan. Pengunjung boleh menikmati tawar-menawar dengan penjual sambil merasai suasana meriah yang mencerminkan semangat pelbagai budaya Kuala Lumpur.',
     petaling_p2: 'Pada waktu malam, kawasan ini berubah menjadi bazar yang berwarna-warni, dengan tanglung bercahaya menerangi jalan-jalan dan gerai makanan yang menawarkan juadah tempatan seperti mi wantan, nasi ayam claypot, dan teh herba yang terkenal. Selain membeli-belah dan menjamu selera, kawasan ini juga menempatkan beberapa kuil dan bangunan warisan yang mempamerkan kepentingan sejarah masyarakat Cina di Malaysia.',
     petaling_station_p: 'Stesen ini sendiri direka untuk kebolehcapaian dan keselesaan. Ia mempunyai eskalator, lif, dan papan tanda yang jelas untuk membimbing pengembara dengan lancar. Reka letak bawah tanahnya juga menyediakan perlindungan daripada keadaan cuaca, menjadikannya ideal untuk pelawat yang merancang untuk menerokai bandar dengan berjalan kaki. Kemudahan berdekatan termasuk medan selera, kedai serbaneka, dan ruang budaya, memastikan penumpang mendapat semua yang mereka perlukan sebaik sahaja melangkah keluar.',
-    
     central_market_p1: 'Pasar Seni (Central Market) ialah mercu tanda budaya di tengah-tengah Kuala Lumpur, asalnya ditubuhkan sebagai pasar basah pada awal abad ke-20 dan kemudian diubah menjadi pusat warisan untuk seni dan kraf tangan Malaysia. Hari ini ia merupakan hab yang meriah di mana pengunjung boleh menemui batik tradisional, cenderamata buatan tangan, karya seni tempatan, dan persembahan yang meraikan warisan pelbagai budaya Malaysia.',
     central_market_p2: 'Arked berbumbung pasar ini menempatkan puluhan gerai dan kedai butik, mempamerkan artisan dan pereka yang mahir. Selain membeli-belah, Pasar Seni sering menganjurkan acara kebudayaan, bengkel kraf dan pameran kecil yang memberikan rasa budaya Malaysia yang asli. Ia adalah persinggahan kegemaran bagi pengunjung yang ingin membeli kenang-kenangan buatan tempatan dan mengalami sisi seni bandar.',
     central_market_station_p: 'Stesen ini sendiri direka untuk kebolehcapaian dan keselesaan. Ia mempunyai eskalator, lif, dan papan tanda yang jelas untuk membimbing pengembara dengan lancar. Reka letak bawah tanahnya juga menyediakan perlindungan daripada keadaan cuaca, menjadikannya ideal untuk pelawat yang merancang untuk menerokai bandar dengan berjalan kaki. Kemudahan berdekatan termasuk medan selera, kedai serbaneka, dan ruang budaya, memastikan penumpang mendapat semua yang mereka perlukan sebaik sahaja melangkah keluar.',
-    
     titiwangsa_p1: 'Titiwangsa ialah destinasi rekreasi popular di Kuala Lumpur, terkenal dengan <b>Taman Tasik Titiwangsa</b> yang luas. Taman ini menawarkan trek joging, laluan berbasikal, aktiviti berperahu, dan ruang hijau terbuka untuk keluarga berehat. Ia juga menempatkan <b>Istana Budaya (Teater Kebangsaan)</b> dan <b>Balai Seni Negara</b>, menjadikannya hab budaya yang menggabungkan alam semula jadi dengan seni dan persembahan.',
     titiwangsa_p2: 'Kawasan ini menjadi kegemaran penduduk tempatan dan pelancong, menyediakan tempat percutian yang damai dari kesibukan pusat bandar sambil mudah diakses dengan pengangkutan awam.',
     titiwangsa_station_p: 'Stesen Titiwangsa menghubungkan penumpang terus ke salah satu kawasan rekreasi paling meriah di Kuala Lumpur. Ia direka untuk kebolehcapaian dan kemudahan, dengan kemudahan moden yang menjadikan perjalanan selesa untuk semua pelawat. Dari stesen, penumpang boleh sampai ke taman tasik, mercu tanda budaya, dan ruang hijau dengan mudah yang mentakrifkan daerah Titiwangsa.',
-    
     bird_park_p1: 'Taman Burung KL adalah salah satu sangkar burung penerbangan bebas terbesar di dunia, menempatkan beribu-ribu burung dari seluruh dunia. Pengunjung boleh menikmati pertemuan dekat dengan spesies eksotik, sesi memberi makan interaktif, dan pameran pendidikan yang memberi tumpuan kepada pemuliharaan burung.',
     bird_park_p2: 'Mudah diakses melalui LRT, Taman Burung KL menyediakan pelarian yang tenang dari kesibukan bandar sambil menawarkan pengalaman yang menyeronokkan dan pendidikan untuk keluarga, pelancong, dan peminat burung.',
     bird_station_p: 'Stesen ini sendiri direka untuk kebolehcapaian dan keselesaan. Ia mempunyai eskalator, lif, dan papan tanda yang jelas untuk membimbing pengembara dengan lancar. Reka letak bawah tanahnya juga menyediakan perlindungan daripada keadaan cuaca, menjadikannya ideal untuk pelawat yang merancang untuk menerokai bandar dengan berjalan kaki. Kemudahan berdekatan termasuk medan selera, kedai serbaneka, dan ruang budaya, memastikan penumpang mendapat semua yang mereka perlukan sebaik sahaja melangkah keluar.',
@@ -306,7 +299,8 @@ const translations = {
     delete_error_not_logged_in: 'Anda mesti log masuk untuk memadam akaun anda.',
     delete_error_password: 'Kata laluan salah. Akaun tidak dipadam.',
 
-    // --- Edit Profile Page ---
+    // --- 【【【 翻译添加在这里 】】】 ---
+    edit_profile_title: 'LRT GuideMe – Sunting Profil',
     edit_profile_button:'Sunting',
     edit_profile_heading: 'Sunting Profil Anda',
     edit_profile_description: 'Kemas kini nama pengguna, e-mel, atau kata laluan anda di bawah.',
@@ -320,6 +314,10 @@ const translations = {
     avatar_label:"Gambar Profil",
     choose_file_btn: "Pilih Fail",
     no_file_chosen: "Tiada fail dipilih",
+    password_placeholder: "Biarkan kosong untuk mengekalkan kata laluan semasa",
+    danger_zone: "Zon Bahaya",
+    danger_zone_desc: "Memadam akaun anda adalah kekal dan tidak boleh dibatalkan.",
+    delete_account_button_long: "Padam Akaun Ini",
 
     // --- Admin Page ---
     welcome_admin: 'Selamat datang, {name}!',
@@ -417,27 +415,21 @@ const translations = {
     facilities: '设施:',
     navigate_in_station: '站内导航',
     
-    // --- (Chinese Translations) ---
     klcc_p1: 'KLCC 是标志性的<b>双峰塔（Petronas Twin Towers）</b>的所在地，这是世界上最高的双子建筑之一。这座地标已成为马来西亚快速发展和现代城市景观的象征。',
     klcc_p2: '塔楼周围是<b>阳光广场（Suria KLCC）</b>，这是一个高级购物中心，提供奢侈品牌、多样化的餐饮选择和绝佳的电影院体验。KLCC 公园提供了一个风景优美的绿色休闲空间，设有慢跑道、喷泉和游乐场，使其成为本地人和游客的热门去处。游客还可以探索 <b>Aquaria KLCC</b>，这是东南亚领先的水族馆之一。',
     klcc_station_p: 'KLCC 站将乘客直接连接到吉隆坡商业区的中心地带。它设计为高度便利，配有自动扶梯和电梯，以满足所有游客的需求。该站战略性地位于地下，提供前往主要景点的遮蔽通道，并与周围的购物和商业区无缝整合。',
-    
     bukit_p1: '武吉免登（Bukit Bintang）是吉隆坡“金三角”的跳动心脏，是一个以购物、餐饮和娱乐而闻名的繁华地区。这里拥有 Pavilion Kuala Lumpur、Fahrenheit88 和 Lot 10 等世界级购物中心，使其成为城市的时尚和零售中心。到了晚上，街道上霓虹闪烁，屋顶酒吧和熙熙攘攘的夜总会使这里焕然一新。',
     bukit_p2: '仅几步之遥便是亚罗街（Jalan Alor），这是一个美食天堂，以其烤海鲜、沙爹和热带甜点吸引着本地人和游客。无论您是寻找奢侈品牌、充满活力的夜生活，还是地道的马来西亚风味，武吉免登都提供了现代城市活力与传统魅力的独特融合。',
     bukit_station_p: 'Masjid Jamek 站是吉隆坡最繁忙和最重要的换乘站之一。它直接连接三条主要的轻轨线路——Kelana Jaya 线、Sri Petaling 线和 Ampang 线——实现整个城市的无缝换乘。该站距离清真寺和其他历史地标仅几步之遥，使其成为通勤者和游客的便利枢纽。',
-    
     petaling_p1: '茨厂街（Petaling Street），又称吉隆坡唐人街，是该市最具标志性和历史性的地区之一。这是一个热闹的市集，遍布着无数摊位，出售从衣服、配饰、纪念品到传统中草药和街头小吃的各种商品。游客可以在与摊主讨价还价的同时，体验反映吉隆坡多元文化精神的活力氛围。',
     petaling_p2: '到了晚上，该地区变成一个五彩缤纷的夜市，发光的灯笼照亮街道，食品摊位提供云吞面、瓦煲鸡饭和著名的凉茶等当地美食。除了购物和餐饮，该地区还拥有数座寺庙和历史建筑，展示了华人社区在马来西亚的历史重要性。',
     petaling_station_p: '该站本身设计注重可达性和舒适性。它配备自动扶梯、电梯和清晰的标牌，以引导旅客顺利通行。其地下布局还提供了遮风挡雨的条件，非常适合计划步行探索城市的游客。附近的设施包括美食广场、便利店和文化空间，确保乘客一出站就能获得所需的一切。',
-    
     central_market_p1: '中央艺术坊（Central Market / Pasar Seni）是吉隆坡市中心的一个文化地标，最初在20世纪初是一个菜市场，后来转变为马来西亚艺术和手工艺的遗产中心。如今，它是一个充满活力的中心，游客可以在这里发现传统的蜡染、手工纪念品、本地艺术品以及庆祝马来西亚多元文化遗产的表演。',
     central_market_p2: '市场的室内拱廊拥有数十个摊位和精品店，展示了技艺精湛的工匠和设计师的作品。除了购物，中央艺术坊还经常举办文化活动、手工艺工作坊和小型展览，提供地道的马来西亚文化体验。对于想要购买本地制作的纪念品并体验城市艺术一面的游客来说，这里是一个热门的停留点。',
     central_market_station_p: '该站本身设计注重可达性和舒适性。它配备自动扶梯、电梯和清晰的标牌，以引导旅客顺利通行。其地下布局还提供了遮风挡雨的条件，非常适合计划步行探索城市的游客。附近的设施包括美食广场、便利店和文化空间，确保乘客一出站就能获得所需的一切。',
-    
     titiwangsa_p1: '蒂蒂旺沙（Titiwangsa）是吉隆坡一个受欢迎的休闲目的地，以广阔的<b>蒂蒂旺沙湖滨公园</b>而闻名。该公园提供慢跑道、自行车道、划船活动和供家庭放松的开阔绿地。这里也是<b>国家剧院（Istana Budaya）</b>和<b>国家美术馆</b>的所在地，使其成为一个将自然与艺术和表演融为一体的文化中心。',
     titiwangsa_p2: '该地区深受当地人和游客的喜爱，提供了一个远离市中心喧嚣的宁静休憩之地，同时通过公共交通仍可轻松抵达。',
     titiwangsa_station_p: '蒂蒂旺沙站将乘客直接连接到吉隆坡最充满活力的休闲区之一。它的设计注重可达性和便利性，拥有现代化的设施，使所有游客的旅行都感到舒适。从车站出发，乘客可以轻松到达构成蒂蒂旺沙区的湖滨公园、文化地标和绿色空间。',
-    
     bird_park_p1: '吉隆坡飞禽公园（KL Bird Park）是世界上最大的自由飞翔鸟舍之一，栖息着来自全球的数千只鸟类。游客可以与奇异物种近距离接触，参与互动喂食，并参观专注于鸟类保护的教育展览。',
     bird_park_p2: '通过轻轨可轻松抵达，吉隆坡飞禽公园提供了一个远离城市喧嚣的宁静之地，同时为家庭、游客和鸟类爱好者提供了有趣和教育性的体验。',
     bird_station_p: '该站本身设计注重可达性和舒适性。它配备自动扶梯、电梯和清晰的标牌，以引导旅客顺利通行。其地下布局还提供了遮风挡雨的条件，非常适合计划步行探索城市的游客。附近的设施包括美食广场、便利店和文化空间，确保乘客一出站就能获得所需的一切。',
@@ -471,7 +463,8 @@ const translations = {
     delete_error_not_logged_in: '您必须登录才能删除您的账户。',
     delete_error_password: '密码不正确。账户未删除。',
 
-    // --- Edit Profile Page ---
+    // --- 【【【 翻译添加在这里 】】】 ---
+    edit_profile_title: 'LRT GuideMe – 编辑资料',
     edit_profile_button:'编辑',
     edit_profile_heading: '编辑您的资料',
     edit_profile_description: '您可以在下方更新用户名、邮箱或密码。',
@@ -482,10 +475,14 @@ const translations = {
     alert_update_success: "资料更新成功！",
     alert_update_failed: "更新失败。",
     alert_update_error: "更新资料时发生错误。",
-    avatar_label: "头像",
+    avatar_label: "头像:",
     choose_file_btn: "选择文件",
     no_file_chosen: "未选择任何文件",
-
+    password_placeholder: "留空以保持当前密码",
+    danger_zone: "危险区域",
+    danger_zone_desc: "删除您的账户是永久性的，无法撤销。",
+    delete_account_button_long: "删除此账户",
+    
     // --- Admin Page ---
     welcome_admin: '欢迎, {name}！',
     admin_dashboard_title: '管理员控制面板',
