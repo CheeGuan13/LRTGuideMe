@@ -46,8 +46,8 @@ let currentSelectedPoi = null;
 // The route type chosen by the user: 'escalator', 'elevator', 'accessible', or
 // null if none selected. This affects which connections are preferred when
 // computing a route.
-// MODIFIED: Default to 'escalator' per user request.
-let selectedRouteType = 'escalator';
+// MODIFIED: [FIX 2] Set to null. No route is active by default on load.
+let selectedRouteType = null;
 
 // The ID of the start POI, taken from the "I am at" dropdown. Only used when
 // computing routes.
@@ -249,11 +249,12 @@ function computeCrossLevelRoute(start, end, startLevel, destLevel, routeType) {
 
   if (!levelCandidates.length) return null; // 没有任何跨层连接
 
-  // 1. 根据用户选择和起点，决定实际要用的连接类型
+  // 1. 根据用户选择，决定实际要用的连接类型
+  // 'routeType' can be null on first run, default to 'escalator'
   let typeToUse = routeType || 'escalator'; // 默认为扶梯
 
-  // 您的逻辑：无障碍路线(accessible)与电梯(elevator)一致，除非起点是 Ramp (type 'accessible')
-  if (typeToUse === 'accessible' && start.type !== 'accessible') {
+  // 您的新逻辑：无障碍路线 (accessible) 始终等同于电梯 (elevator) 路线
+  if (typeToUse === 'accessible') {
     typeToUse = 'elevator';
   }
 
@@ -575,11 +576,14 @@ function renderMap(){
     poly.setAttribute('class','route-line');
     poly.setAttribute('points', dynPts.map(pt => `${pt.x},${pt.y}`).join(' '));
     poly.setAttribute('fill','none');
-    // 根据所选路线类型着色
-    let col = '#e11d48';
+    
+    // Use routeType from calculation, fallback to blue
+    let col = '#1d4ed8'; // Default blue
+    // selectedRouteType might be null, but the button highlight is handled by calculateAndDrawRoute
     if (selectedRouteType === 'escalator') col = '#1d4ed8';
     else if (selectedRouteType === 'elevator') col = '#6366f1';
-    else if (selectedRouteType === 'accessible') col = '#0ea5e9';
+    else if (selectedRouteType === 'accessible') col = '#6366f1'; // Per request, accessible = elevator
+    
     poly.setAttribute('stroke', col);
     poly.setAttribute('stroke-width','6');
     poly.setAttribute('stroke-linecap','round');
@@ -687,6 +691,10 @@ function setActive(list, el){
   if (el && el.classList) el.classList.add('active');
 }
 
+/**
+ * 核心函数：计算并绘制从起点到终点的路线。
+ * 它处理同层和跨层，并更新信息面板。
+ */
 async function calculateAndDrawRoute() {
   // 1. 检查是否选了终点
   if (!currentSelectedPoi) {
@@ -749,12 +757,16 @@ async function calculateAndDrawRoute() {
     const routePts = computeSimpleRoute(startPoi, targetPoi, destLvKey);
     dynamicRoutes[destLvKey] = routePts;
     steps = generateSteps(routePts, targetPoi.name);
+    
     // 您的需求：同层时，清除路线类型高亮
     navScope.querySelectorAll('[data-route]').forEach(b=>b.classList.remove('active'));
+    // Also reset the state variable
+    selectedRouteType = null;
 
   } else {
     // 跨层导航
     // (startPoi 包含 type, 用于 Ramp 判断)
+    // 'selectedRouteType' may be null here, computeCrossLevelRoute will default to 'escalator'
     const cross = computeCrossLevelRoute(startPoi, targetPoi, startLvKey, destLvKey, selectedRouteType);
     
     if (!cross) {
@@ -767,9 +779,18 @@ async function calculateAndDrawRoute() {
       return;
     }
 
-    // 您的需求：高亮实际使用的路线按钮
-    setActive([...navScope.querySelectorAll('[data-route]')], navScope.querySelector(`[data-route="${cross.connType}"]`));
-    selectedRouteType = cross.connType; // 同步状态
+    // MODIFIED: [FIX 1]
+    // 只有在用户 *没有* 选择路线时 (selectedRouteType === null)，
+    // (例如：用户第一次点击 "Get Directions")，
+    // 我们才用计算出的类型 (cross.connType) 来更新UI和状态。
+    if (selectedRouteType === null) {
+        selectedRouteType = cross.connType;
+        setActive([...navScope.querySelectorAll('[data-route]')], navScope.querySelector(`[data-route="${cross.connType}"]`));
+    }
+    // 如果用户 *已经* 点击了 "accessible" 或 "elevator" (selectedRouteType != null),
+    // 那么 bindUI 已经设置了高亮，我们 *不会* 覆盖它。
+    // "accessible" 按钮将保持高亮，即使用户被引导至电梯。
+
 
     dynamicRoutes[startLvKey] = cross.startPath;
     dynamicRoutes[destLvKey]  = cross.destPath;
@@ -824,7 +845,7 @@ function bindUI(){
     const g = findBtnByText(lvlScope, 'Ground Floor');
     const p = findBtnByText(lvlScope, 'Platform Level');
     if (g) g.dataset.level = 'L1';
-    if (p) g.dataset.level = 'L2';
+    if (p) p.dataset.level = 'L2';
     levelBtns = [g,p].filter(Boolean);
   }
   lvlScope.addEventListener('click', (e)=>{
@@ -850,16 +871,24 @@ function bindUI(){
   ensureNavBtn('Accessible Route','accessible');
 
   navScope.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-route]');
-    if (!btn) return;
-    const type = btn.dataset.route;
+    const btn = e.target.closest('[data-route]');
+    if (!btn) return;
+    const type = btn.dataset.route;
 
     // 如果点击的已经是当前激活的类型，则不执行任何操作
-    if (selectedRouteType === type && btn.classList.contains('active')) return;
-    
-    selectedRouteType = type;
-    setActive([...navScope.querySelectorAll('[data-route]')], btn);
-    
+    // (MODIFIED: [FIX 1] Removed the 'active' check to allow re-calculation)
+    if (selectedRouteType === type) {
+        // If it's already selected, re-run the calculation
+        // in case the start/end points changed.
+        if (currentStartPoiId && currentSelectedPoi) {
+             calculateAndDrawRoute();
+        }
+        return;
+    }
+    
+    selectedRouteType = type;
+    setActive([...navScope.querySelectorAll('[data-route]')], btn);
+    
     // === 核心修改 ===
     // 检查是否已经有起点和终点 (即路线正在显示中)
     if (currentStartPoiId && currentSelectedPoi) {
@@ -871,7 +900,7 @@ function bindUI(){
       dynamicRoutes = {};
       rerender(); 
     }
-  });
+  });
 
   /* 过滤器 */
   document.querySelectorAll('.type-filter').forEach(cb=>{
@@ -959,12 +988,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
                   || findBtnByText(lvlScope, currentLevel === 'L2' ? 'Platform Level' : 'Ground Floor');
   if (curLvlBtn) setActive([...lvlScope.querySelectorAll('[data-level]')], curLvlBtn);
 
-  // MODIFIED: Always highlight the default selected route type on load
-  if (selectedRouteType) {
-    const navScope = document.querySelector('.navigation-type') || document;
-    const curRouteBtn = navScope.querySelector(`[data-route="${selectedRouteType}"]`);
-    if (curRouteBtn) setActive([...navScope.querySelectorAll('[data-route]')], curRouteBtn);
-  }
+  // MODIFIED: [FIX 2] Deleted the block that highlights the default route type on load.
+  // Route type buttons are not highlighted by default anymore.
 
   // 5) 绑定事件
   bindUI();
