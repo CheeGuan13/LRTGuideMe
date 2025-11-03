@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Station Map</title>
+  <link rel="stylesheet" href="styles/style.css" />
+
+  <!-- Load custom i18n helper script -->
+  <script src="scripts/i18n.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+</head>
+
+<body>
+  <!-- 顶部导航 -->
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <!-- Language selector for i18n -->
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+      <!-- Link to AR demo page -->
+      <a class="btn small" href="ar-demo.html" data-i18n-key="ar_demo" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black">AR Demo</a>
+      <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 主体 -->
+  <main class="container station-layout">
+    <!-- 左：起点选择 + 地图 -->
+    <section class="map-section">
+      <!-- 把原来的搜索输入替换为“我在这里”下拉 -->
+      <div class="searchbar" style="display:flex; gap:12px; align-items:center;">
+        <label for="startSel" class="micro" style="min-width:120px;" data-i18n-key="iam_at">I am at:</label>
+        <select id="startSel" aria-label="Select your current location" style="flex:1;"></select>
+      </div>
+
+      <!-- 地图画布（JS 会生成 SVG 放进来） -->
+      <div id="mapCanvas" class="map-canvas panel" aria-label="Station map"></div>
+    </section>
+
+    <!-- 右：信息面板 -->
+    <aside class="panel info-aside">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+          <h2 style="margin:0; font-size:20px;" data-i18n-key="station_map">Station Map</h2>
+          <!-- currentStationLabel will be populated via script -->
+          <p id="currentStationLabel" class="micro" style="margin:2px 0 0;"></p>
+        </div>
+        <a class="btn small" href="station-select.html" title="Change Station" data-i18n-key="change_station">Change Station</a>
+      </div>
+
+      <hr style="margin:14px 0; border:none; border-top:1px solid #e5e7eb;" />
+
+      <h3 style="margin:0 0 8px;" data-i18n-key="station_levels">Station Levels</h3>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="btn tab active" data-level="ground" data-i18n-key="ground_floor">Ground Floor</button>
+        <button class="btn tab" data-level="platform" data-i18n-key="platform_level">Platform Level</button>
+      </div>
+
+      <h3 style="margin:8px 0;" data-i18n-key="navigation_type">Navigation Type</h3>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn outline route" data-route="escalator" data-i18n-key="escalator_route">Escalator Route</button>
+        <button class="btn outline route" data-route="elevator" data-i18n-key="elevator_route">Elevator Route</button>
+        <button class="btn outline route" data-route="accessible" data-i18n-key="accessible_route">Accessible Route</button>
+      </div>
+
+      <div id="infoBox" class="panel" style="margin-top:14px;">
+        <strong data-i18n-key="facility_info">Facility Info</strong>
+        <div id="infoBody" class="micro" style="margin-top:6px; color:#475569;" data-i18n-key="tap_any_dot">
+          Tap any dot on the map to view its details here.
+        </div>
+      </div>
+
+      <button id="getDirBtn" class="btn" style="width:100%; margin-top:10px;" disabled data-i18n-key="get_directions">Get Directions</button>
+    </aside>
+  </main>
+
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+
+  <script src="scripts/kl-sentral-map.js" defer></script>
+  <script src="scripts/navigation.js" defer></script>
+  <script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>

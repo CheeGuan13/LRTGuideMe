@@ -1,0 +1,114 @@
+<!-- Load translation helpers -->
+<script src="scripts/i18n.js" defer></script>
+<script src="scripts/attraction.js" defer></script>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – KLCC</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+<header class="container nav">
+  <a class="brand" href="index.html">
+    <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+    <span class="notranslate">LRT GuideMe</span>
+  </a>
+  <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+    <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="zh">中文</option>
+    </select>
+    <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <!-- 景点部分 -->
+  <h1 class="page-title notranslate">KLCC</h1>
+  <section class="grid two-column">
+    <div class="image-left">
+      <img src="assets/images/KLCC.jpg" alt="KLCC Twin Towers" class="attraction-img"/>
+    </div>
+    <div class="info-right">
+      <h2><span data-i18n-key="about_header">About</span> <span class="notranslate">KLCC</span></h2>
+      <p data-i18n-key="klcc_p1">
+        KLCC is home to the iconic <b>Petronas Twin Towers</b>, among the tallest twin structures in the world. 
+        This landmark has become a symbol of Malaysia’s rapid development and modern cityscape.
+      </p>
+      <p data-i18n-key="klcc_p2">
+        Surrounding the towers is <b>Suria KLCC</b>, a premier shopping mall offering luxury brands, 
+        diverse dining, and an excellent cinema experience. KLCC Park provides a scenic green escape 
+        with jogging paths, fountains, and a playground, making it a popular destination for both locals 
+        and tourists. Visitors can also explore <b>Aquaria KLCC</b>, one of Southeast Asia’s leading oceanariums.
+      </p>
+      <p><b data-i18n-key="nearest_station">Nearest LRT Station:</b> <span class="notranslate">KLCC Station (KJ10)</span></p>
+    </div>
+  </section>
+
+  <!-- 站点部分 -->
+  <h2 class="section-title"><span class="notranslate">KLCC</span> <span data-i18n-key="station_info_header">Station Information</span></h2>
+  <section class="grid two-column reverse">
+    <div class="info-left">
+      <ul>
+        <li><b data-i18n-key="line_label_detail">Line:</b> 
+        <span class="dot kelana"></span> Kelana Jaya Line
+        <li><b data-i18n-key="station_code">Station Code:</b> KJ10</li>
+        <li><b data-i18n-key="nearby_landmarks">Nearby Landmarks:</b> Petronas Twin Towers, Suria KLCC, KLCC Park</li>
+        <li><b data-i18n-key="facilities">Facilities:</b> Elevator, Toilet, Customer Service Counter</li>
+      </ul>
+      <p data-i18n-key="klcc_station_p">
+        KLCC Station directly connects passengers to the heart of Kuala Lumpur’s commercial district. 
+        It is designed for high accessibility, with escalators and lifts that cater to visitors of all needs. 
+        The station is strategically located underground, providing sheltered access to major attractions 
+        and seamless integration with surrounding shopping and business areas.
+      </p>
+      <button class="btn primary navigate-btn" data-station="KLCC" data-i18n-key="navigate_in_station">
+        Navigate in station
+      </button>
+    </div>
+    <div class="image-right">
+      <img src="assets/images/KLCC-Station.jpg" alt="KLCC Station" class="station-img"/>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">© 2025 LRT GuideMe</footer>
+<script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>

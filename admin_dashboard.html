@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n-key="admin_dashboard_title">LRT GuideMe – Admin Dashboard</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <script src="scripts/i18n.js" defer></script>
+</head>
+
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="profile-card" style="position:relative;">
+      <h2 id="adminNameDisplay" class="profile-username">Loading...</h2>
+
+      <a href="logout_admin.php" 
+         class="logout-btn" 
+         data-i18n-key="logout_button_admin" 
+         style="margin-bottom: 15px;">
+        Logout
+      </a>
+    </div>
+  </main>
+
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+
+  <script>
+    // === 检查管理员登录状态 ===
+    fetch('session_check_admin.php')
+      .then(response => response.json())
+      .then(data => {
+        const adminEl = document.getElementById('adminNameDisplay');
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+        const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
+
+        if (data.logged_in && data.username) {
+          adminEl.textContent = welcomePrefix + data.username;
+        } else {
+          adminEl.textContent = 'Not Logged In';
+          window.location.href = 'login-admin.html';
+          return;
+        }
+
+        if (typeof applyTranslations === 'function') {
+          applyTranslations(lang);
+        }
+      })
+      .catch(err => {
+        console.error('Session check failed:', err);
+        document.getElementById('adminNameDisplay').textContent = 'Error';
+      });
+  </script>
+
+  <script>
+    // === 语言切换联动 ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSelect = document.getElementById('langSelect');
+      const adminEl = document.getElementById('adminNameDisplay');
+
+      if (langSelect) {
+        langSelect.addEventListener('change', () => {
+          const newLang = langSelect.value;
+          localStorage.setItem('preferredLang', newLang);
+          if (typeof applyTranslations === 'function') {
+            applyTranslations(newLang);
+          }
+
+          const tDict = (typeof translations !== 'undefined' && translations[newLang]) ? translations[newLang] : {};
+          const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
+
+          if (adminEl && adminEl.textContent.includes(',')) {
+            const username = adminEl.textContent.split(',')[1]?.trim() || '';
+            adminEl.textContent = welcomePrefix + username;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

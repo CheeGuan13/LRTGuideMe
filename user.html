@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n-key="user_page_title">LRT GuideMe – User Profile</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <script src="scripts/i18n.js" defer></script>
+</head>
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="profile-card" style="position:relative;">
+      <a href="edit_profile.html"
+         class="edit-btn"
+         data-i18n-key="edit_profile_button"
+         style="
+           position:absolute;
+           top:10px;
+           right:10px;
+           background-color:#3b82f6;
+           color:white;
+           padding:6px 10px;
+           border-radius:6px;
+           font-size:14px;
+           text-decoration:none;">
+         Edit
+      </a>
+      
+      <img id="userAvatar" src="assets/images/user-icon.png" alt="User Avatar" class="profile-avatar">
+
+      <h2 id="usernameDisplay" class="profile-username">Loading...</h2>
+      <p class="profile-status" data-i18n-key="logged_in_status">
+        You are logged in to LRT GuideMe.
+      </p>
+
+      <a href="logout.php" class="logout-btn" data-i18n-key="logout_button" style="margin-bottom: 15px;">
+        Logout
+      </a>
+
+      <button id="deleteAccountBtn"
+              class="delete-btn "
+              data-i18n-key="delete_account_button"
+              style="margin-bottom: 15px;">
+        Delete Account
+      </button>
+    </div>
+  </main>
+
+  <script>
+    // 获取用户名并显示
+    fetch('session_check.php')
+      .then(response => response.json())
+      .then(data => {
+        const userEl = document.getElementById('usernameDisplay');
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+        const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
+
+        if (data.logged_in && data.username) {
+          userEl.textContent = welcomePrefix + data.username;
+        } else {
+          userEl.textContent = 'Not Logged In';
+          window.location.href = 'login.html'; // 如果未登录，直接跳走
+          return; // 阻止后续代码执行
+        }
+
+        // 显示头像
+        const avatarImg = document.getElementById('userAvatar');
+        if (avatarImg) {
+          avatarImg.src = data.avatar && data.avatar.trim() !== '' 
+            ? data.avatar 
+            : 'assets/images/user-icon.png';
+        }
+
+        // 确保页面加载时翻译正确
+        if (typeof applyTranslations === 'function') {
+          applyTranslations(lang);
+        }
+
+        // === 删除按钮处理 ===
+        const deleteBtn = document.getElementById('deleteAccountBtn');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', () => {
+            const currentLang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+            const currentTranslations = (typeof translations !== 'undefined' && translations[currentLang]) ? translations[currentLang] : {};
+
+            const confirmMsg1 = currentTranslations.delete_confirm_1 || 'Are you sure you want to delete your account? This action cannot be undone.';
+            const promptMsg = currentTranslations.delete_prompt_password || 'To confirm deletion, please enter your password:';
+            const confirmMsg2 = currentTranslations.delete_confirm_2 || 'FINAL CONFIRMATION: Delete account permanently?';
+            const cancelMsg = currentTranslations.delete_cancelled || 'Account deletion cancelled.';
+            const errorMsg = currentTranslations.delete_error_generic || 'An error occurred. Please try again.';
+
+            if (!confirm(confirmMsg1)) {
+              alert(cancelMsg);
+              return;
+            }
+
+            const password = prompt(promptMsg);
+            if (password === null || password.trim() === '') {
+              alert(cancelMsg);
+              return;
+            }
+
+            if (!confirm(confirmMsg2)) {
+              alert(cancelMsg);
+              return;
+            }
+
+            fetch('delete_account.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `password=${encodeURIComponent(password)}`
+            })
+              .then(response => response.json())
+              .then(result => {
+                if (result.success) {
+                  window.location.href = result.redirectUrl || 'login.html?status=delete_success';
+                } else {
+                  const errorKey = result.messageKey || 'delete_error_generic';
+                  const errorMessage = currentTranslations[errorKey] || errorMsg;
+                  alert(errorMessage);
+                }
+              })
+              .catch(err => {
+                console.error('Delete account failed:', err);
+                alert(errorMsg);
+              });
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Session check failed:', err);
+        document.getElementById('usernameDisplay').textContent = 'Error';
+        const deleteBtn = document.getElementById('deleteAccountBtn');
+        if (deleteBtn) deleteBtn.disabled = true;
+      });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get('status');
+      const error = urlParams.get('error');
+      const messageKey = status || error;
+
+      if (messageKey) {
+        setTimeout(() => {
+          const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+          const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+          const message = tDict[messageKey] || messageKey.replace(/_/g, ' ') || 'An unknown message occurred.';
+          alert(message);
+
+          if (window.history.replaceState) {
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+          }
+        }, 150);
+      }
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSelect = document.getElementById('langSelect');
+      const userEl = document.getElementById('usernameDisplay');
+
+      if (langSelect) {
+        langSelect.addEventListener('change', () => {
+          const newLang = langSelect.value;
+          localStorage.setItem('preferredLang', newLang);
+          if (typeof applyTranslations === 'function') {
+            applyTranslations(newLang);
+          }
+
+          // ✅ 重新翻译欢迎语
+          const tDict = (typeof translations !== 'undefined' && translations[newLang]) ? translations[newLang] : {};
+          const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
+
+          // 如果当前显示的文字是 “Welcome, username” 或 “Selamat datang, username”等
+          // 就重新更新它
+          if (userEl && userEl.textContent.includes(',')) {
+            const username = userEl.textContent.split(',')[1]?.trim() || '';
+            userEl.textContent = welcomePrefix + username;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

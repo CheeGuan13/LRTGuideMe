@@ -1,0 +1,117 @@
+<!-- Load translation helpers -->
+<script src="scripts/i18n.js" defer></script>
+<script src="scripts/attraction.js" defer></script>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Central Market</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+<header class="container nav">
+  <a class="brand" href="index.html">
+    <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+    <span class="notranslate">LRT GuideMe</span>
+  </a>
+  <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+    <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="zh">中文</option>
+    </select>
+    <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <!-- 景点部分 -->
+  <h1 class="page-title notranslate">Central Market</h1>
+  <section class="grid two-column">
+    <div class="image-left">
+      <img src="assets/images/Central-Market.jpg" alt="Central Market Kuala Lumpur" class="attraction-img"/>
+    </div>
+    <div class="info-right">
+      <h2><span data-i18n-key="about_header">About</span> <span class="notranslate">Central Market</span></h2>
+      <p data-i18n-key="central_market_p1">
+        Central Market (Pasar Seni) is a cultural landmark in the heart of Kuala Lumpur, originally established as a wet market in the early 20th century 
+        and later transformed into a heritage centre for Malaysian arts and crafts. Today it is a vibrant hub where visitors can discover traditional batik, 
+        hand-made souvenirs, local artworks, and performances that celebrate Malaysia’s multicultural heritage.
+      </p>
+      <p data-i18n-key="central_market_p2">
+        The market’s covered arcade is home to dozens of stalls and boutique shops, showcasing skilled artisans and designers. In addition to shopping, Central Market 
+        frequently hosts cultural events, craft workshops and small exhibitions that provide an authentic taste of Malaysian culture. It’s a favourite stop for visitors 
+        who want to buy locally-made keepsakes and experience the city’s artistic side.
+      </p>
+      <p><b data-i18n-key="nearest_station">Nearest LRT Station:</b> <span class="notranslate">Pasar Seni Station (KJ14)</span></p>
+    </div>
+  </section>
+
+  <!-- 站点部分 -->
+  <h2 class="section-title"><span class="notranslate">Pasar Seni</span> <span data-i18n-key="station_info_header">Station Information</span></h2>
+  <section class="grid two-column reverse">
+    <div class="info-left">
+      <ul>
+       <li><b data-i18n-key="line_label_detail">Line:</b> 
+        <span class="dot kelana"></span> Kelana Jaya Line (KJ14), 
+        <span class="dot sripetaling"></span> Sri Petaling Line (SP02)
+      </li>
+      <li><b data-i18n-key="station_code">Station Code:</b> KJ14 / SP02</li>
+      <li><b data-i18n-key="interchange">Interchange:</b> Yes (2 lines)</li>
+      <li><b data-i18n-key="nearby_landmarks">Nearby Landmarks:</b> Central Market, Petaling Street (Chinatown), River of Life, KL Bird Park, Islamic Arts Museum</li>
+      <li><b data-i18n-key="facilities">Facilities:</b> Elevator, Toilet, Customer Service Counter, Ticket Vending Machines</li>
+    </ul>
+      <p data-i18n-key="central_market_station_p">
+        The station itself is designed for accessibility and comfort. It features escalators, elevators, and clear 
+        signages to guide travelers smoothly. Its underground layout also provides shelter from weather conditions, 
+        making it ideal for visitors who plan to explore the city on foot. Nearby facilities include food courts, 
+        convenience stores, and cultural spaces, ensuring that passengers have everything they need as soon as they step out.
+      </p>
+      <button class="btn primary navigate-btn" data-station="Pasar Seni" data-i18n-key="navigate_in_station">
+        Navigate in station
+      </button>
+    </div>
+    <div class="image-right">
+      <img src="assets/images/Pasar-Seni-Station.jpg" alt="Pasar Seni Station" class="station-img"/>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">© 2025 LRT GuideMe</footer>
+<script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>

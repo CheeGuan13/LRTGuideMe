@@ -1,0 +1,386 @@
+:root{
+  --brand:#2563eb;
+  --brand-ink:#fff;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --bg:#ffffff;
+  --surface:#ffffff;
+  --radius:16px;
+  --shadow:0 10px 24px rgba(2,6,23,.08);
+  --space:24px;
+  --container:1120px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:700;
+  color:inherit;
+  text-decoration:none;
+}
+.brand-logo{
+  width:58px;
+  height:58px;
+}
+.station-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: block;
+  transition: transform 0.3s ease, filter 0.3s ease; 
+}
+
+.station-img:hover {
+  transform: scale(1.05);    
+  filter: brightness(1.1);   
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;                   
+}
+
+.card-content {
+  flex-grow: 1;        
+  padding: 1rem;
+}
+
+.card-footer {
+  text-align: center;  
+  padding: 1rem;
+}
+
+/* 隐藏 Google 标志和文字 */
+.goog-logo-link, .goog-te-gadget span, .goog-te-banner-frame {
+  display: none !important;
+}
+.goog-te-gadget {
+  font-size: 0; /* 去掉“Powered by Google Translate” */
+}
+
+    #google_translate_element .goog-te-gadget > span,
+    #google_translate_element .goog-te-gadget-simple > span,
+    .goog-logo-link,
+    .goog-te-gadget .goog-te-gadget-icon,
+    .goog-te-banner-frame,
+    .goog-te-banner-frame.skiptranslate { display:none !important; }
+    #google_translate_element .goog-te-gadget { font-size:0 !important; }
+    #google_translate_element select.goog-te-combo { font-size:14px !important; }
+    body { top:0 !important; }
+
+/* 下拉框美化 */
+.translate select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+
+.translate select:hover {
+  border-color: #1a73e8;
+  box-shadow: 0 0 4px rgba(26, 115, 232, 0.5);
+}
+
+.menu {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto; 
+}
+
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+img{max-width:100%;display:block}
+a{color:var(--brand);text-decoration:none}
+.container{max-width:var(--container);margin:0 auto;padding:0 var(--space)}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{font-weight:700}
+.menu a{margin-left:16px}
+.menu .btn{margin-left:16px}
+
+.hero{padding:56px 0}
+.hero h1{font-size:40px;margin:0 0 8px}
+.hero .sub{color:var(--muted);max-width:64ch;margin:0 0 24px}
+
+.btn{border:1px solid #e2e8f0;background:#fff;border-radius:12px;padding:10px 16px;cursor:pointer}
+.btn.small{padding:6px 10px;font-size:14px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+
+.search{display:grid;grid-template-columns:1fr 1fr max-content;gap:12px;align-items:end}
+.field{display:flex;flex-direction:column;gap:6px}
+input,select{padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;outline:none}
+input:focus,select:focus{border-color:#bfdbfe;box-shadow:0 0 0 3px rgba(191,219,254,.6)}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--space)}
+.cards .card{grid-column:span 4;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.cards .card h3{margin:12px 0 8px}
+.page-title{margin:24px 0}
+.toolbar{display:flex;gap:12px;align-items:center;margin:12px 0 24px}
+
+.panel{margin-top:16px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px}
+
+.footer{padding:32px 0;color:var(--muted);text-align:center}
+
+@media (max-width:1024px){
+  .cards .card{grid-column:span 6}
+}
+@media (max-width:640px){
+  .hero h1{font-size:28px}
+  .search{grid-template-columns:1fr}
+  .cards .card{grid-column:span 12}
+}
+
+/* 大按钮网格在手机上更易点按 */
+#destinations .card { text-align:center }
+#destinations .btn { margin-top:8px }
+#routeSteps ol { padding-left: 18px }
+
+    :root{
+      --line-kelana:#ec4899;        
+      --line-sripetaling:#ef4444;  
+      --line-ampang:#f59e0b;        
+      --surface-2:#f8fafc;
+    }
+    .page-head{ display:flex; align-items:center; gap:12px; margin:16px 0 10px; }
+    .page-sub{ color:var(--muted); margin:0 0 16px }
+    .picker{
+      background:var(--surface-2); border:1px solid #e2e8f0; border-radius:16px;
+      padding:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px; padding:10px 14px;
+      border:1px solid #e2e8f0; border-radius:999px; background:#fff; cursor:pointer;
+      box-shadow: var(--shadow); user-select:none;
+    }
+    .chip[aria-pressed="true"]{ outline:3px solid rgba(37,99,235,.2); }
+    .dot{ width:12px; height:12px; border-radius:999px; display:inline-block }
+    .dot.kelana{ background:var(--line-kelana) }
+    .dot.sripetaling{ background:var(--line-sripetaling) }
+    .dot.ampang{ background:var(--line-ampang) }
+
+    .searchbar{ margin:14px 0; display:flex; gap:10px; align-items:center }
+    .searchbar input{
+      flex:1; height:44px; border-radius:12px; border:1px solid #e2e8f0; padding:0 14px; background:#fff;
+    }
+    .group-head{ display:flex; align-items:center; gap:10px; margin:12px 0 8px; font-weight:600; }
+    .badge{ font-size:12px; padding:2px 8px; border-radius:999px; background:#f1f5f9; border:1px solid #e2e8f0 }
+    .station-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:16px; }
+    .station-card{
+      grid-column: span 3; display:flex; align-items:center; gap:10px; padding:14px 16px;
+      background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:var(--shadow);
+      cursor:pointer; transition: transform .08s ease;
+    }
+    .station-card:active{ transform: scale(.98) }
+    .train-ic{ width:20px; height:20px; opacity:.8 }
+    @media (max-width:1024px){ .station-card{ grid-column: span 4 } }
+    @media (max-width:640px){ .station-card{ grid-column: span 12 } }
+  
+    /* Attraction & Station Layout */
+.grid.two-column {
+  display: grid;
+  grid-template-columns: 2fr 3fr;   /* 图片占2/5，文字占3/5 */
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.grid.two-column.reverse {
+  grid-template-columns: 3fr 2fr;   /* 站点部分文字在左，图在右 */
+}
+
+/* 手机端：上下排布 */
+@media (max-width: 768px) {
+  .grid.two-column,
+  .grid.two-column.reverse {
+    grid-template-columns: 1fr;     /* 单列布局 */
+  }
+  .image-left, .image-right {
+    order: 1;   /* 图片始终在上 */
+  }
+  .info-left, .info-right {
+    order: 2;   /* 文字始终在下 */
+  }
+}
+
+/* 图片适配 */
+/* ✅ 首页卡片图片 (index 专用) */
+.cards .card img {
+  width: 100%;
+  height: 184px;        /* 固定高度，缩略图 */
+  object-fit: cover;    /* 自动裁剪，保持美观 */
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: block;
+}
+
+/* ✅ 景点页 / 站点页的图片 (不限制高度，保持原比例) */
+.attraction-img,
+.station-img {
+  width: 100%;
+  height: auto;         /* 原比例显示 */
+  border-radius: 12px;
+  display: block;
+}
+.map-canvas { height: 55vh; border-radius: 12px; }
+.btn.tab.active, .btn.route.active { background:#111827; color:#fff; }
+.btn.outline { background:#fff; border:1px solid #e5e7eb; }
+.badge{display:inline-block;padding:2px 8px;font-size:12px;border:1px solid #e5e7eb;border-radius:999px;background:#f8fafc;margin-left:6px}
+
+/* ---------- Station Map Layout ---------- */
+/* 为导航页面定义响应式布局的样式。station-layout 容器默认水平排列左侧地图与右侧面板；
+   在移动端（小于 768px 宽）时改为垂直排列，面板在下方显示。 */
+.station-layout {
+  display: flex;
+  gap: 20px;
+}
+.station-layout .map-section {
+  flex: 1 1 70%;
+}
+.station-layout .info-aside {
+  flex: 1 1 30%;
+  min-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .station-layout {
+    flex-direction: column;
+  }
+  .station-layout .map-section,
+  .station-layout .info-aside {
+    width: 100%;
+    flex: none;
+  }
+  .station-layout .info-aside {
+    margin-top: 16px;
+    min-width: auto;
+  }
+  
+  /* ================================================================= */
+  /* 【【【 优化点 2：修改这里 】】】
+  /* /* 允许地图画布在x轴（水平）滚动
+  /* /* 原代码:
+  /* overflow: hidden;
+  /*
+  /* 修改后:
+  .map-canvas {
+    height: 55vh;
+    overflow: auto; /* <--- 允许滚动 */
+  }
+  /* ================================================================= */
+
+  .map-canvas svg {
+    transform: none;
+  }
+
+
+polyline {
+  animation: dash 1s linear infinite;
+}
+@keyframes dash {
+  to { stroke-dashoffset: -14; }
+}
+
+/* ------------------------------------------------------------ */
+/* 地图 SVG 相关样式
+ * 默认隐藏站点地图中的 polyline（例如预设的灰色示意路线），仅显示设置了
+ * “route-line” 类名的动态导航路线。通过覆盖 display 和动画可避免灰线干扰。
+ */
+.map-canvas svg polyline {
+  display: none;
+}
+.map-canvas svg polyline.route-line {
+  display: block;
+  animation: none;
+  stroke-dasharray: none;
+}
+
+/* 隐藏可能遗留的线段元素（用于早期走廊线条），仅保留区域块和动态路径 */
+.map-canvas svg line {
+  display: none;
+}
+
+/* ---------- User Profile Page Styles ---------- */
+.profile-card {
+  width: 100%;
+  max-width: 450px;
+  /* 居中显示 */
+  margin: 50px auto 0 auto; 
+  padding: 30px 40px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  text-align: center;
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 15px auto;
+  border: 2px solid #eee;
+}
+.profile-username {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  /* 防止用户名太长而溢出 */
+  word-wrap: break-word;
+}
+.profile-status {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 30px 0;
+}
+
+/* 一个更醒目的红色登出按钮 */
+.logout-btn {
+  /* 借用 .btn 的一些基础样式 */
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  
+  /* 登出专用红色 */
+  background: #dc2626; /* 红色 */
+  color: white;
+  border: 1px solid #dc2626;
+  transition: background 0.2s ease;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.delete-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+
+  box-sizing: border-box;
+  line-height: normal;
+  font-family: inherit;
+  height: auto;
+  
+  /* 登出专用红色 */
+  background-color: #f87171; 
+  color: white; 
+  border: 1px solid #f87171;
+  transition: background 0.2s ease;
+}

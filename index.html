@@ -1,0 +1,190 @@
+<!-- Removed Google Translate plugin. Use custom language selector instead -->
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Home</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <!-- Load custom i18n helper script -->
+  <script src="scripts/i18n.js" defer></script>
+</head>
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <!-- Language selector for i18n -->
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+      <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+      </div>
+    </nav>
+  </header>
+
+
+<main class="container">
+  <section class="hero">
+  <h1 data-i18n-key="welcome">Find your way inside the LRT station</h1>
+  <p class="sub" data-i18n-key="tagline">Your smart navigation companion for LRT stations.</p>
+  <button class="btn primary" id="startNav" data-i18n-key="start_navigation">Start Navigation</button>
+  <p class="micro" data-i18n-key="micro_info">Tap to pick your current station →  choose a destination inside the station.</p>
+</section>
+
+    <h2 data-i18n-key="popular_attractions">Popular Attractions Among Malaysia</h2>
+    <section class="grid cards" aria-label="Popular attractions">
+
+    <article class="card">
+      <img class="station-img" src="assets/images/KLCC.jpg" alt="KLCC Twin Towers" />
+      <div class="card-content">
+        <h3 class="notranslate">KLCC</h3>
+        <p>Iconic Petronas Twin Towers • Shopping & City Views</p>
+      </div>
+      <div class="card-footer">
+      <a class="btn" href="attraction-klcc.html" data-i18n-key="view_details">View details</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="station-img" src="assets/images/Titiwangsa.jpg" alt="Titiwangsa Lake Gardens" />
+      <div class="card-content">
+        <h3 class="notranslate">Titiwangsa</h3>
+        <p>Titiwangsa Lake Gardens • Recreation, boating, Istana Budaya & National Art Gallery.</p>
+      </div>
+      <div class="card-footer">
+        <a class="btn" href="attraction-titiwangsa.html" data-i18n-key="view_details">View details</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="station-img" src="assets/images/Bukit-Bintang.jpg" alt="Bukit Bintang street" />
+      <div class="card-content">
+        <h3 class="notranslate">Bukit Bintang</h3>
+        <p>Shopping paradise • Street food & nightlife</p>
+      </div>
+      <div class="card-footer">
+        <a class="btn" href="attraction-bukit-bintang.html" data-i18n-key="view_details">View details</a>
+      </div>
+    </article>
+
+    <article class="card">
+  <img class="station-img" src="assets/images/Central-Market.jpg" alt="Central Market" />
+  <div class="card-content">
+    <h3 class="notranslate">Central Market</h3>
+    <p>Cultural hub of Kuala Lumpur • Art, craft, and heritage experiences</p>
+  </div>
+  <div class="card-footer">
+    <a class="btn" href="attraction-central-market.html" data-i18n-key="view_details">View details</a>
+  </div>
+</article>
+
+
+    <article class="card">
+      <img class="station-img" src="assets/images/Petaling-Street.jpg" alt="Petaling Street market" />
+      <div class="card-content">
+        <h3 class="notranslate">Petaling Street</h3>
+        <p>Chinatown market • Local food & culture</p>
+      </div>
+      <div class="card-footer">
+        <a class="btn" href="attraction-petaling-street.html" data-i18n-key="view_details">View details</a>
+      </div>
+    </article>
+
+<article class="card">
+    <img class="station-img" src="assets/images/KL-Bird-Park.jpg" alt="KL Bird Park" />
+    <div class="card-content">
+      <h3 class="notranslate">KL Bird Park</h3>
+      <p>One of the largest free-flight aviaries • Exotic birds & family-friendly activities</p>
+    </div>
+    <div class="card-footer">
+      <a class="btn" href="attraction-kl-bird-park.html" data-i18n-key="view_details">View details</a>
+    </div>
+  </article>
+</section>
+
+
+  </main>
+
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+  <script src="scripts/main.js"></script>
+  <script>
+  // 1. 设置一个默认的全局登录状态
+  window.isUserLoggedIn = false; 
+  
+  // 2. 检查登录状态
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+      
+      // 3. 当服务器返回结果后，更新这个全局变量
+      window.isUserLoggedIn = data.logged_in; 
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        // 点击头像跳转用户主页
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => {
+        console.error('Session check failed:', err);
+        window.isUserLoggedIn = false; // 出错时也默认为未登录
+    });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const error = urlParams.get('error');
+    const messageKey = status || error; // 获取 URL 中的 key (status 或 error)
+
+    if (messageKey) {
+      // 稍微等待一下，确保 i18n.js 已加载并可能已应用初始翻译
+      setTimeout(() => {
+        // 尝试获取当前语言设置
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        // 尝试获取翻译字典
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+
+        // 查找翻译文本，如果找不到，就用 key 本身或一个通用消息作为后备
+        const message = tDict[messageKey] || messageKey.replace(/_/g, ' ') || 'An unknown message occurred.';
+
+        alert(message); // 弹出翻译后的提示
+
+        // (可选) 清理 URL 参数，这样刷新页面就不会再次弹出提示
+        if (window.history.replaceState) {
+           const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+           window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+        }
+      }, 150); // 150毫秒的延迟通常足够了
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – AR Demo</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <!-- A-Frame and AR.js libraries -->
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.3.1/aframe/build/aframe-ar.js"></script>
+</head>
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+      <span>LRT GuideMe</span>
+    </a>
+  </header>
+  <main class="container">
+    <h1 class="page-title">AR Navigation Demo</h1>
+    <p>This page demonstrates a simple augmented reality overlay. Point your camera at the "Hiro" marker (a bold black-and-white square) to see a 3D arrow appear.</p>
+    <!-- AR scene: uses webcam as the video source. debugUIEnabled disabled for a cleaner view. -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+      <!-- Marker preset: "hiro" is one of the default patterns included in AR.js. You can print it out and place it in your environment. -->
+      <a-marker preset="hiro">
+        <!-- A simple 3D arrow using a cone and cylinder to indicate direction. -->
+        <a-entity position="0 0.1 0" rotation="-90 0 0">
+          <a-cone height="0.4" radius-bottom="0.1" radius-top="0" color="#2563eb"></a-cone>
+          <a-cylinder height="0.2" radius="0.025" position="0 -0.3 0" color="#2563eb"></a-cylinder>
+        </a-entity>
+      </a-marker>
+      <!-- Camera entity required for AR.js -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </main>
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+</body>
+</html>

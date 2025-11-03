@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n-key="edit_profile_title">LRT GuideMe – Edit Profile</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <script src="scripts/i18n.js" defer></script>
+</head>
+
+<body>
+  <!-- ✅ Header 区，与 user.html 一致 -->
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+    </nav>
+  </header>
+
+  <!-- ✅ 主体 -->
+  <main class="container">
+    <div class="profile-card" style="max-width:400px;margin:auto;">
+      <h2 data-i18n-key="edit_profile_heading" style="margin-bottom:10px;">Edit Your Profile</h2>
+      <p data-i18n-key="edit_profile_description" style="color:#666;margin-bottom:20px;">
+        Update your username, email, or password below.
+      </p>
+
+      <!-- ✅ 编辑表单 -->
+      <form id="editForm" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:14px;">
+        <label>
+          <span data-i18n-key="username_label">Username:</span>
+          <input type="text" id="editUsername" name="username" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
+
+        <label>
+          <span data-i18n-key="email_label">Email:</span>
+          <input type="email" id="editEmail" name="email" required style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
+
+        <label>
+          <span data-i18n-key="password_label">New Password:</span>
+          <input type="password" id="editPassword" name="password" placeholder="Leave blank to keep current password" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;">
+        </label>
+
+        <div class="custom-file">
+          <label for="editAvatar" data-i18n-key="avatar_label">Profile Picture:</label>
+          <div class="file-box"
+              style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;
+                      display:flex;align-items:center;gap:10px;background-color:#fff;">
+            <input type="file" id="editAvatar" name="avatar" accept="image/*" style="display:none;">
+            <button type="button" id="customFileBtn" class="btn small" data-i18n-key="choose_file_btn">
+              Choose File
+            </button>
+            <span id="fileName" data-i18n-key="no_file_chosen" style="color:#666;flex:1;">
+              No file chosen
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;gap:10px;margin-top:10px;">
+          <button type="submit" 
+                  class="btn small" 
+                  style="background-color:#22c55e;color:white;border-color:#22c55e;flex:1;"
+                  data-i18n-key="save_button">
+            Save Changes
+          </button>
+
+          <a href="user.html" 
+             class="btn small" 
+             style="background-color:#9ca3af;color:white;text-align:center;flex:1;"
+             data-i18n-key="cancel_button">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ✅ JS 逻辑 -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 获取语言
+    const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+    if (typeof applyTranslations === 'function') applyTranslations(lang);
+
+    // === 1️⃣ 获取用户信息 ===
+    fetch('session_check.php')
+    .then(res => res.json())
+    .then(data => {
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+
+        if (data.logged_in) {
+        console.log(data.username, data.email);
+        // ✅ 改成正确的 input ID
+        document.getElementById('editUsername').value = data.username || '';
+        document.getElementById('editEmail').value = data.email || '';
+        } else {
+        alert(tDict.alert_login_first || 'Please log in first.');
+        window.location.href = 'login.html';
+        }
+    })
+    .catch(err => {
+        console.error('Failed to load user info:', err);
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+        alert(tDict.alert_load_profile_error || 'Error loading profile.');
+    });
+
+    // === 自定义文件选择按钮逻辑 ===
+    const fileInput = document.getElementById('editAvatar');
+    const customBtn = document.getElementById('customFileBtn');
+    const fileName = document.getElementById('fileName');
+
+    customBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+      const tDict = translations[lang] || translations.en;
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+      } else {
+        fileName.textContent = tDict.no_file_chosen;
+      }
+    });
+
+    // === 2️⃣ 表单提交处理 ===
+    const form = document.getElementById('editForm');
+    form.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    fetch('update_profile.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(res => res.json())
+        .then(result => {
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+
+        if (result.success) {
+            alert(tDict.alert_update_success || 'Profile updated successfully!');
+            window.location.href = 'user.html';
+        } else {
+            alert(result.message || tDict.alert_update_failed || 'Update failed.');
+        }
+        })
+        .catch(err => {
+        console.error('Error updating profile:', err);
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+        alert(tDict.alert_update_error || 'Error updating profile.');
+        });
+    });
+});
+  </script>
+</body>
+</html>

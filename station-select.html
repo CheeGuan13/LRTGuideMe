@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Select Station</title>
+  <link rel="stylesheet" href="styles/style.css" />
+
+  <!-- Load custom i18n helper script instead of Google Translate -->
+  <script src="scripts/i18n.js" defer></script>
+</head>
+
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <!-- Language selector -->
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+      <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="page-head">
+      <button class="btn small" onclick="history.back()" data-i18n-key="back">← Back</button>
+      <h1 class="page-title" style="margin:0" data-i18n-key="select_current_station">Select Current Station</h1>
+    </div>
+    <p class="page-sub" data-i18n-key="select_line_prompt">Select your <strong data-i18n-key="line_label">line</strong>, then pick your station to continue.</p>
+
+    <div id="linePicker" class="picker" aria-label="Pick a line"></div>
+
+    <div class="searchbar">
+      <input id="stationSearch2" data-i18n-placeholder="search_placeholder" placeholder="Search stations..." aria-label="Search stations"/>
+    </div>
+
+    <div class="group-head" id="groupTitle">
+      <span class="dot kelana" id="groupDot"></span>
+      <span id="groupName">Kelana Jaya Line</span>
+      <span class="badge" data-i18n-key="line_label">Line</span>
+    </div>
+
+    <section class="station-grid" id="stationList2"></section>
+
+    <div id="continueBox" style="display:none; margin-top:20px; text-align:center;">
+      <button class="btn primary" id="continueBtn" data-i18n-key="continue_to_map">Continue to Map</button>
+    </div>
+  </main>
+
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+
+  <script src="scripts/station-select.js"></script>
+  <script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>

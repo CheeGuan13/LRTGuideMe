@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Login</title> <link rel="stylesheet" href="styles/style.css" />
+  <script src="scripts/i18n.js" defer></script>
+</head>
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="container" style="display:flex;justify-content:center;align-items:center;min-height:70vh;">
+    <form class="login-box" action="login.php" method="POST"
+      style="width:100%;max-width:400px;padding:30px;border:1px solid #ddd;border-radius:10px;
+             box-shadow:0 2px 6px rgba(0,0,0,0.1);background:#fff;">
+
+      <h2 data-i18n-key="login_title" style="text-align:center;margin-bottom:20px;">Login to LRT GuideMe</h2>
+
+      <label for="username" data-i18n-key="username_label" style="display:block;margin-bottom:6px;">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required
+             style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:15px;">
+
+      <label for="password" data-i18n-key="password_label" style="display:block;margin-bottom:6px;">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required
+             style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:20px;">
+
+      <button type="submit" class="btn primary" data-i18n-key="login_button"
+              style="width:100%;padding:10px;border:none;border-radius:6px;background:#0078d7;color:white;font-size:16px;cursor:pointer;">
+        Login
+      </button>
+
+      <p style="text-align:center;margin-top:15px;font-size:14px;">
+        <a href="forgot_password.html" data-i18n-key="forgot_password" style="color:#0078d7;text-decoration:none;">Forgot password?</a>
+      </p>
+
+      <p style="text-align:center;margin-top:10px;font-size:14px;">
+        <span data-i18n-key="no_account">Don't have an account?</span>
+        <a href="signup.html" data-i18n-key="sign_up" style="color:#0078d7;text-decoration:none;font-weight:500;">Sign up here</a>
+      </p>
+
+      <p style="text-align:center;margin-top:10px;font-size:14px;">
+        <span data-i18n-key="admin_login_prompt">Login as administrator?</span>
+        <a href="login-admin.html" data-i18n-key="admin_login_link" style="color:#d32f2f;text-decoration:none;font-weight:500;">Login as Admin</a>
+      </p>
+    </form>
+  </main>
+
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const error = urlParams.get('error');
+    const messageKey = status || error; // 获取 URL 中的 key (status 或 error)
+
+    if (messageKey) {
+      // 稍微等待一下，确保 i18n.js 已加载并可能已应用初始翻译
+      setTimeout(() => {
+        // 尝试获取当前语言设置
+        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
+        // 尝试获取翻译字典
+        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+
+        // 查找翻译文本，如果找不到，就用 key 本身或一个通用消息作为后备
+        const message = tDict[messageKey] || messageKey.replace(/_/g, ' ') || 'An unknown message occurred.';
+
+        alert(message); // 弹出翻译后的提示
+
+        // (可选) 清理 URL 参数，这样刷新页面就不会再次弹出提示
+        if (window.history.replaceState) {
+           const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+           window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+        }
+      }, 150); // 150毫秒的延迟通常足够了
+    }
+  });
+</script>
+</body>
+</html>

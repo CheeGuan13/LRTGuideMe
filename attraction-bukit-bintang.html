@@ -1,0 +1,116 @@
+<!-- Load translation helpers -->
+<script src="scripts/i18n.js" defer></script>
+<script src="scripts/attraction.js" defer></script>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Bukit Bintang</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+<header class="container nav">
+  <a class="brand" href="index.html">
+    <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+    <span class="notranslate">LRT GuideMe</span>
+  </a>
+  <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+    <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="zh">中文</option>
+    </select>
+    <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <!-- 景点部分 -->
+  <h1 class="page-title notranslate">Bukit Bintang</h1>
+  <section class="grid two-column">
+    <div class="image-left">
+      <img src="assets/images/Bukit-Bintang.jpg" alt="Bukit Bintang" class="attraction-img"/>
+    </div>
+    <div class="info-right">
+      <h2><span data-i18n-key="about_header">About</span> <span class="notranslate">Bukit Bintang</span></h2>
+      <p data-i18n-key="bukit_p1">
+        Bukit Bintang is the beating heart of Kuala Lumpur’s “Golden Triangle”, a lively district famous for shopping, dining, and entertainment. 
+        The area is home to world-class malls such as Pavilion Kuala Lumpur, Fahrenheit88, and Lot 10, making it the city’s fashion and retail hub. 
+        At night, the streets transform with neon lights, rooftop bars, and bustling nightclubs.
+      </p>
+      <p data-i18n-key="bukit_p2">
+        Just steps away lies Jalan Alor, a street food haven that attracts locals and tourists alike with its grilled seafood, satay, and tropical desserts. 
+        Whether you’re searching for luxury brands, vibrant nightlife, or authentic Malaysian flavors, Bukit Bintang offers a unique blend of modern city energy and traditional charm.
+      </p>
+      <p><b data-i18n-key="nearest_station">Nearest LRT Station:</b> <span class="notranslate">Masjid Jamek Station (connect to Monorail for Bukit Bintang)</span></p>
+    </div>
+  </section>
+
+  <!-- 站点部分 -->
+  <h2 class="section-title"><span class="notranslate">Masjid Jamek</span> <span data-i18n-key="station_info_header">Station Information</span></h2>
+  <section class="grid two-column reverse">
+    <div class="info-left">
+      <ul>
+        <li><b data-i18n-key="line_label_detail">Line:</b> 
+          <span class="dot kelana"></span> Kelana Jaya Line, 
+          <span class="dot sripetaling"></span> Sri Petaling Line, 
+          <span class="dot ampang"></span> Ampang Line
+        </li>
+        <li><b data-i18n-key="station_code">Station Code:</b> KJ13 / SP7 / AG7</li>
+        <li><b data-i18n-key="interchange">Interchange:</b> Yes (3 lines)</li>
+        <li><b data-i18n-key="nearby_landmarks">Nearby Landmarks:</b> Jamek Mosque, River of Life, Merdeka Square</li>
+        <li><b data-i18n-key="facilities">Facilities:</b> Elevator, Toilet, Customer Service Counter</li>
+      </ul>
+     <p data-i18n-key="bukit_station_p">
+      Masjid Jamek Station is one of the busiest and most important interchange stations in Kuala Lumpur. 
+      It directly connects three major LRT lines – Kelana Jaya, Sri Petaling, and Ampang – allowing seamless transfers across the city. 
+      The station is located just steps away from the mosque and other heritage landmarks, making it a convenient hub for both commuters and tourists.
+    </p> 
+      <button class="btn primary navigate-btn" data-station="Masjid Jamek" data-i18n-key="navigate_in_station">
+        Navigate in station
+      </button>
+    </div>
+    <div class="image-right">
+      <img src="assets/images/Masjid-Jamek-Station.jpg" alt="Masjid Jamek Station" class="station-img"/>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">© 2025 LRT GuideMe</footer>
+<script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>

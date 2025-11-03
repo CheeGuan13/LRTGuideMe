@@ -1,0 +1,118 @@
+<!-- Load translation helpers -->
+<script src="scripts/i18n.js" defer></script>
+<script src="scripts/attraction.js" defer></script>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LRT GuideMe – Titiwangsa</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+<header class="container nav">
+  <a class="brand" href="index.html">
+    <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon">
+    <span class="notranslate">LRT GuideMe</span>
+  </a>
+  <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+    <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="zh">中文</option>
+    </select>
+    <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <!-- 景点部分 -->
+  <h1 class="page-title notranslate">Titiwangsa</h1>
+  <section class="grid two-column">
+    <div class="image-left">
+      <img src="assets/images/Titiwangsa.jpg" alt="Titiwangsa Lake Gardens" class="attraction-img"/>
+    </div>
+    <div class="info-right">
+      <h2><span data-i18n-key="about_header">About</span> <span class="notranslate">Titiwangsa</span></h2>
+      <p data-i18n-key="titiwangsa_p1">
+        Titiwangsa is a popular recreational destination in Kuala Lumpur, best known for the expansive 
+        <b>Titiwangsa Lake Gardens</b>. The park offers jogging tracks, cycling paths, boating activities, 
+        and open green spaces for families to relax. It is also home to <b>Istana Budaya (National Theatre)</b> 
+        and the <b>National Art Gallery</b>, making it a cultural hub that blends nature with art and performance.
+      </p>
+      <p data-i18n-key="titiwangsa_p2">
+        The area is a favorite among both locals and tourists, providing a peaceful retreat from the bustling city center 
+        while still being easily accessible by public transport.
+      </p>
+      <p><b data-i18n-key="nearest_station">Nearest LRT Station:</b> <span class="notranslate">Titiwangsa Station</span></p>
+    </div>
+  </section>
+
+  <!-- 站点部分 -->
+  <h2 class="section-title"><span class="notranslate">Titiwangsa</span> <span data-i18n-key="station_info_header">Station Information</span></h2>
+  <section class="grid two-column reverse">
+    <div class="info-left">
+      <ul>
+        <li><b data-i18n-key="line_label_detail">Line:</b> 
+          <span class="dot kelana"></span> Kelana Jaya Line
+          <span class="dot sripetaling"></span> Sri Petaling Line
+          <span class="dot ampang"></span> Ampang Line
+        </li>
+        <li><b data-i18n-key="station_code">Station Code:</b> KJ20 / SP10 / AG10</li>
+        <li><b data-i18n-key="interchange">Interchange:</b> Yes (3 lines)</li>
+        <li><b data-i18n-key="nearby_landmarks">Nearby Landmarks:</b> Titiwangsa Lake Gardens, Istana Budaya, National Art Gallery</li>
+        <li><b data-i18n-key="facilities">Facilities:</b> Elevator, Toilet, Customer Service Counter</li>
+      </ul>
+      <p data-i18n-key="titiwangsa_station_p">
+        Titiwangsa Station directly connects passengers to one of Kuala Lumpur’s most vibrant recreational areas. 
+        It is designed for accessibility and convenience, with modern facilities that make traveling comfortable 
+        for all visitors. From the station, passengers can easily reach the lake gardens, cultural landmarks, 
+        and green spaces that define the Titiwangsa district.
+      </p>
+      <button class="btn primary navigate-btn" data-station="Titiwangsa" data-i18n-key="navigate_in_station">
+        Navigate in station
+      </button>
+    </div>
+    <div class="image-right">
+      <img src="assets/images/Titiwangsa-Station.jpg" alt="Titiwangsa Station" class="station-img"/>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">© 2025 LRT GuideMe</footer>
+<script>
+  fetch('session_check.php')
+    .then(response => response.json())
+    .then(data => {
+      const userArea = document.getElementById('userArea');
+
+      if (data.logged_in) {
+        userArea.innerHTML = `
+          <div id="userMenu" style="position:relative;">
+            <img src="assets/images/user-icon.png" alt="User Avatar"
+                 style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+          </div>
+        `;
+
+        document.querySelector('#userMenu img').addEventListener('click', () => {
+          window.location.href = 'user.html';
+        });
+      } else {
+        userArea.innerHTML = `
+          <a href="login.html" id="loginBtn" class="btn"
+             style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;color:black;text-decoration:none;">
+            Login
+          </a>
+        `;
+      }
+    })
+    .catch(err => console.error('Session check failed:', err));
+</script>
+</body>
+</html>
