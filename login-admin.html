@@ -30,11 +30,13 @@
       <h2 data-i18n-key="admin_login_title" style="text-align:center;margin-bottom:20px;color:#d32f2f;">Admin Login</h2>
 
       <label for="username" data-i18n-key="username_label" style="display:block;margin-bottom:6px;">Username</label>
-      <input type="text" id="username" name="username" placeholder="Enter admin username" required
+     
+      <input type="text" id="username" name="username" data-i18n-placeholder="admin_username_placeholder" placeholder="Enter admin username" required
              style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:15px;">
 
       <label for="password" data-i18n-key="password_label" style="display:block;margin-bottom:6px;">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter admin password" required
+      
+      <input type="password" id="password" name="password" data-i18n-placeholder="admin_password_placeholder" placeholder="Enter admin password" required
              style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:20px;">
 
       <button type="submit" class="btn primary" data-i18n-key="admin_login_button"
@@ -61,7 +63,10 @@
       setTimeout(() => {
         const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
         const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
+        
+        // 【【【 修改：使用新的 admin_... keys 】】】
         const message = tDict[messageKey] || messageKey.replace(/_/g, ' ') || 'An unknown message occurred.';
+        
         alert(message);
         if (window.history.replaceState) {
            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
