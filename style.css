@@ -188,77 +188,70 @@ input:focus,select:focus{border-color:#bfdbfe;box-shadow:0 0 0 3px rgba(191,219,
     /* Attraction & Station Layout */
 .grid.two-column {
   display: grid;
-  grid-template-columns: 2fr 3fr;   /* 图片占2/5，文字占3/5 */
+  grid-template-columns: 2fr 3fr;   
   gap: 24px;
   align-items: center;
   margin-bottom: 40px;
 }
 
 .grid.two-column.reverse {
-  grid-template-columns: 3fr 2fr;   /* 站点部分文字在左，图在右 */
+  grid-template-columns: 3fr 2fr;   
 }
 
 /* 手机端：上下排布 */
 @media (max-width: 768px) {
   .grid.two-column,
   .grid.two-column.reverse {
-    grid-template-columns: 1fr;     /* 单列布局 */
+    grid-template-columns: 1fr;     
   }
   .image-left, .image-right {
-    order: 1;   /* 图片始终在上 */
+    order: 1;   
   }
   .info-left, .info-right {
-    order: 2;   /* 文字始终在下 */
+    order: 2;   
   }
 }
 
 /* 图片适配 */
-/* ✅ 首页卡片图片 (index 专用) */
 .cards .card img {
   width: 100%;
-  height: 184px;        /* 固定高度，缩略图 */
-  object-fit: cover;    /* 自动裁剪，保持美观 */
+  height: 184px;        
+  object-fit: cover;    
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   display: block;
 }
 
-/* ✅ 景点页 / 站点页的图片 (不限制高度，保持原比例) */
 .attraction-img,
 .station-img {
   width: 100%;
-  height: auto;         /* 原比例显示 */
+  height: auto;         
   border-radius: 12px;
   display: block;
 }
 
 /* ================================================================= */
-/* 【【【 优化点 1：修改 】】】
-/*
-/* .map-canvas 现在负责设置高度和 overflow: hidden
-/*
+/* 【【【 地图导航页布局修复 】】】 */
+/* ================================================================= */
+
 .map-canvas { 
-  height: 55vh; 
   border-radius: 12px;
-  overflow: hidden; /* svg-pan-zoom 库需要这个 */
-/*
-/* 【【【 优化点 2：新增 】】】
-/*
-/* 新增这个规则，让 SVG 始终填满 .map-canvas 容器
-/*
+  overflow: hidden; 
+  border: 1px solid #e2e8f0; 
+}
+
 .map-canvas svg {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1000 / 540; 
+  height: auto; 
+  display: block; 
 }
-/* ================================================================= */
 
 .btn.tab.active, .btn.route.active { background:#111827; color:#fff; }
 .btn.outline { background:#fff; border:1px solid #e5e7eb; }
 .badge{display:inline-block;padding:2px 8px;font-size:12px;border:1px solid #e5e7eb;border-radius:999px;background:#f8fafc;margin-left:6px}
 
 /* ---------- Station Map Layout ---------- */
-/* 为导航页面定义响应式布局的样式。station-layout 容器默认水平排列左侧地图与右侧面板；
-   在移动端（小于 768px 宽）时改为垂直排列，面板在下方显示。 */
 .station-layout {
   display: flex;
   gap: 20px;
@@ -285,18 +278,9 @@ input:focus,select:focus{border-color:#bfdbfe;box-shadow:0 0 0 3px rgba(191,219,
     min-width: auto;
   }
   
-  /* ================================================================= */
-  /* 【【【 优化点 3：修改 】】】
-  /* /* 原来的 .map-canvas 规则现在是多余的，
-  /* /* 并且 overflow: auto 也是错误的，所以我们把它改回 hidden
-  /* ================================================================= */
   .map-canvas {
-    height: 55vh;
-    overflow: hidden; /* 库会处理平移 */
+    overflow: hidden; 
   }
-
-  /* 【【【 优化点 4：移除 】】】 */
-  /* .map-canvas svg { ... } 规则已不再需要 */
   
 } /* <--- 这是 @media (max-width: 768px) 的结束括号 */
 
@@ -309,10 +293,6 @@ polyline {
 }
 
 /* ------------------------------------------------------------ */
-/* 地图 SVG 相关样式
- * 默认隐藏站点地图中的 polyline（例如预设的灰色示意路线），仅显示设置了
- * “route-line” 类名的动态导航路线。通过覆盖 display 和动画可避免灰线干扰。
- */
 .map-canvas svg polyline {
   display: none;
 }
@@ -322,7 +302,6 @@ polyline {
   stroke-dasharray: none;
 }
 
-/* 隐藏可能遗留的线段元素（用于早期走廊线条），仅保留区域块和动态路径 */
 .map-canvas svg line {
   display: none;
 }
@@ -331,7 +310,6 @@ polyline {
 .profile-card {
   width: 100%;
   max-width: 450px;
-  /* 居中显示 */
   margin: 50px auto 0 auto; 
   padding: 30px 40px;
   border: 1px solid #ddd;
@@ -346,13 +324,12 @@ polyline {
   border-radius: 50%;
   margin: 0 auto 15px auto;
   border: 2px solid #eee;
-  object-fit: cover; /* 【【新增】】确保上传的头像不会变形 */
+  object-fit: cover; 
 }
 .profile-username {
   font-size: 22px;
   font-weight: 600;
   margin: 0 0 5px 0;
-  /* 防止用户名太长而溢出 */
   word-wrap: break-word;
 }
 .profile-status {
@@ -361,9 +338,7 @@ polyline {
   margin: 0 0 30px 0;
 }
 
-/* 一个更醒目的红色登出按钮 */
 .logout-btn {
-  /* 借用 .btn 的一些基础样式 */
   padding: 10px 16px;
   border-radius: 12px;
   font-size: 16px;
@@ -371,9 +346,7 @@ polyline {
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  
-  /* 登出专用红色 */
-  background: #dc2626; /* 红色 */
+  background: #dc2626; 
   color: white;
   border: 1px solid #dc2626;
   transition: background 0.2s ease;
@@ -391,17 +364,109 @@ polyline {
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-
   box-sizing: border-box;
   line-height: normal;
   font-family: inherit;
   height: auto;
-  
-  /* 登出专用红色 */
   background-color: #f87171; 
   color: white; 
   border: 1px solid #f87171;
   transition: background 0.2s ease;
 }
 
-/* 【【【 修复：多余的 } 括号已删除 】】】 */
+/* ========================================= */
+/* 【 user profile 和 edit profile 的美化 】 */
+/* ========================================= */
+
+html, body {
+  background-color: #f8fafc;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+  justify-content: space-between;
+}
+
+.profile-actions .btn,
+.profile-actions .logout-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.quick-links-box {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 25px;
+  margin-top: 25px;
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #e2e8f0;
+}
+
+.quick-links-box h3 {
+  margin: 0 0 15px 0;
+  text-align: center;
+  font-size: 18px;
+}
+
+.quick-links-box ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick-links-box li a {
+  display: block;
+  padding: 10px 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--brand);
+  border: 1px solid #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.quick-links-box li a:hover {
+  background: #f1f5f9;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 20px auto; 
+  border: 2px solid #eee;
+  object-fit: cover; 
+}
+
+.avatar-preview-box {
+  text-align: center;
+}
+
+.danger-zone {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  text-align: center; 
+}
+
+.btn-danger {
+  background-color: #dc2626; 
+  color: white;
+  border-color: #dc2626;
+  transition: background 0.2s ease;
+}
+.btn-danger:hover {
+  background-color: #b91c1c; 
+  border-color: #b91c1c;
+}

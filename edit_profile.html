@@ -85,16 +85,11 @@
 
       
       <div class="danger-zone">
-        <h3 data-i18n-key="danger_zone">Danger Zone</h3>
-        <p data-i18n-key="danger_zone_desc">
-          Deleting your account is permanent and cannot be undone.
-        </p>
         <button id="deleteAccountBtn" class="btn btn-danger" data-i18n-key="delete_account_button_long">
           Delete This Account
         </button>
       </div>
-
-    </div>
+      </div>
   </main>
 
   
@@ -193,7 +188,7 @@
       });
     });
 
-    // === 4️⃣ 【【 新增：删除按钮的事件处理 (从 user.html 移入) 】】】 ===
+    // === 4️⃣ 删除按钮的事件处理 (逻辑不变) ===
     const deleteBtn = document.getElementById('deleteAccountBtn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {

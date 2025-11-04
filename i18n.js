@@ -38,6 +38,9 @@ const translations = {
     welcome_prefix: 'Welcome, ',
     logged_in_status: 'You are logged in to LRT GuideMe.',
     logout_button: 'Logout',
+    back_to_navigation: "Back to Navigation",
+    quick_links: "Quick Links",
+    home_page: "Home Page",
 
     // --- Forgot Password Page ---
     reset_page_title: 'Reset Your Password',
@@ -68,6 +71,7 @@ const translations = {
     start_not_found: 'Selected start location not found in station map.',
     cross_level_unavailable: 'Cross-level navigation is not available between these floors.',
     map_coming_soon: 'Map coming soon...',
+    on_level: "on",
 
     // --- Station Select Page ---
     select_current_station: 'Select Current Station',
@@ -202,6 +206,9 @@ const translations = {
     welcome_prefix: 'Selamat datang, ',
     logged_in_status: 'Anda telah log masuk ke LRT GuideMe.',
     logout_button: 'Log Keluar',
+    back_to_navigation: "Kembali ke Navigasi",
+    quick_links: "Pautan Pantas",
+    home_page: "Laman Utama",
 
     // --- Forgot Password Page ---
     reset_page_title: 'Tetapkan Semula Kata Laluan Anda',
@@ -232,6 +239,7 @@ const translations = {
     start_not_found: 'Lokasi permulaan yang dipilih tidak ditemui dalam peta stesen.',
     cross_level_unavailable: 'Navigasi antara tingkat tidak tersedia untuk aras ini.',
     map_coming_soon: 'Peta akan datang...',
+    on_level: "di",
 
     // --- Station Select Page ---
     select_current_station: 'Pilih Stesen Semasa',
@@ -366,6 +374,9 @@ const translations = {
     welcome_prefix: '欢迎, ',
     logged_in_status: '您已登录 LRT GuideMe。',
     logout_button: '登出',
+    back_to_navigation: "返回导航",
+    quick_links: "快速导航",
+    home_page: "返回首页",
 
     // --- Forgot Password Page ---
     reset_page_title: '重置您的密码',
@@ -396,6 +407,7 @@ const translations = {
     start_not_found: '所选起点未在站点地图中找到。',
     cross_level_unavailable: '这些楼层之间无法进行跨层导航。',
     map_coming_soon: '地图即将上线...',
+    on_level: "在",
 
     // --- Station Select Page ---
     select_current_station: '选择当前车站',

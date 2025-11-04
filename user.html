@@ -22,7 +22,8 @@
     </nav>
   </header>
 
-  <main class="container">
+<main class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+    
     <div class="profile-card" style="position:relative;">
 
       <a href="edit_profile.html"
@@ -48,13 +49,24 @@
         You are logged in to LRT GuideMe.
       </p>
 
-      <a href="logout.php" class="logout-btn" data-i18n-key="logout_button" style="margin-bottom: 15px;">
-        Logout
-      </a>
+      <div class="profile-actions">
+        <a href="navigation.html" class="btn primary" data-i18n-key="back_to_navigation" style="flex:1;">
+          Back to Navigation
+        </a>
+        <a href="logout.php" class="logout-btn" data-i18n-key="logout_button" style="flex:1;">
+          Logout
+        </a>
+      </div>
+      </div>
 
-      
+    <div class="quick-links-box">
+      <h3 data-i18n-key="quick_links">Quick Links</h3>
+      <ul>
+        <li><a href="index.html" data-i18n-key="home_page">Home Page</a></li>
+        <li><a href="station-select.html" data-i18n-key="change_station">Change Station</a></li>
+      </ul>
     </div>
-  </main>
+    </main>
 
   <script>
     // 获取用户名并显示 (只保留 session_check.php 逻辑)

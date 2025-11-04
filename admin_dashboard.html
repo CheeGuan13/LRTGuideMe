@@ -20,76 +20,112 @@
         <option value="ms">Bahasa Melayu</option>
         <option value="zh">中文</option>
       </select>
+      <a href="logout_admin.php" class="btn small" data-i18n-key="logout_button_admin">Logout</a>
     </nav>
   </header>
 
   <main class="container">
-    <div class="profile-card" style="position:relative;">
-      <h2 id="adminNameDisplay" class="profile-username">Loading...</h2>
+    <h1 id="adminNameDisplay" class="page-title">Loading Admin...</h1>
 
-      <a href="logout_admin.php" 
-         class="logout-btn" 
-         data-i18n-key="logout_button_admin" 
-         style="margin-bottom: 15px;">
-        Logout
-      </a>
-    </div>
+    <section class="grid two-column">
+      
+      <div class="panel" style="grid-column: span 8;">
+        <h2>Manage Stations</h2>
+        <p>Select a station to edit its levels, floor plans, and POIs.</p>
+        <div id="stationList">
+          <p>Loading stations...</p>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column: span 4;">
+        <h2>Add New Station</h2>
+        <form id="addStationForm" style="display:flex; flex-direction:column; gap:10px;">
+          <label for="stationName">Station Name:</label>
+          <input type="text" id="stationName" name="stationName" placeholder="e.g., KLCC" required style="padding: 8px;">
+          
+          <label for="defaultLevel">Default Level Name:</label>
+          <input type="text" id="defaultLevel" name="defaultLevel" value="L1" required style="padding: 8px;">
+          
+          <button type="submit" class="btn primary">Add Station</button>
+        </form>
+      </div>
+
+    </section>
+
   </main>
 
   <footer class="container footer">© 2025 LRT GuideMe</footer>
 
   <script>
-    // === 检查管理员登录状态 ===
+    // === 1. 检查管理员登录状态 ===
     fetch('session_check_admin.php')
       .then(response => response.json())
       .then(data => {
         const adminEl = document.getElementById('adminNameDisplay');
-        const lang = window.currentLang || localStorage.getItem('preferredLang') || 'en';
-        const tDict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : {};
-        const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
-
         if (data.logged_in && data.username) {
-          adminEl.textContent = welcomePrefix + data.username;
+          adminEl.textContent = 'Welcome, ' + data.username;
         } else {
-          adminEl.textContent = 'Not Logged In';
           window.location.href = 'login-admin.html';
-          return;
-        }
-
-        if (typeof applyTranslations === 'function') {
-          applyTranslations(lang);
         }
       })
       .catch(err => {
         console.error('Session check failed:', err);
-        document.getElementById('adminNameDisplay').textContent = 'Error';
+        window.location.href = 'login-admin.html';
       });
-  </script>
 
-  <script>
-    // === 语言切换联动 ===
-    document.addEventListener('DOMContentLoaded', () => {
-      const langSelect = document.getElementById('langSelect');
-      const adminEl = document.getElementById('adminNameDisplay');
-
-      if (langSelect) {
-        langSelect.addEventListener('change', () => {
-          const newLang = langSelect.value;
-          localStorage.setItem('preferredLang', newLang);
-          if (typeof applyTranslations === 'function') {
-            applyTranslations(newLang);
+    // === 2. 加载车站列表 ===
+    const stationListEl = document.getElementById('stationList');
+    function loadStations() {
+      fetch('admin_get_stations.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            stationListEl.innerHTML = `<p style="color:red;">${data.error}</p>`;
+            return;
           }
-
-          const tDict = (typeof translations !== 'undefined' && translations[newLang]) ? translations[newLang] : {};
-          const welcomePrefix = tDict.welcome_prefix || 'Welcome, ';
-
-          if (adminEl && adminEl.textContent.includes(',')) {
-            const username = adminEl.textContent.split(',')[1]?.trim() || '';
-            adminEl.textContent = welcomePrefix + username;
+          if (data.length === 0) {
+            stationListEl.innerHTML = `<p>No stations found. Add one on the right!</p>`;
+            return;
           }
+          
+          stationListEl.innerHTML = data.map(station => `
+            <div class="station-card" style="display:flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px;">
+              <span><strong>${station.name}</strong> (Default: ${station.default_level})</span>
+              <a href="admin_manage_station.html?id=${station.id}" class="btn small primary">Manage</a>
+            </div>
+          `).join('');
         });
-      }
+    }
+
+    // === 3. 处理“添加新车站”表单 ===
+    document.getElementById('addStationForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const postData = new URLSearchParams({
+          action: 'add_station',
+          stationName: formData.get('stationName'),
+          defaultLevel: formData.get('defaultLevel')
+      });
+
+      fetch('admin_api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: postData
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          alert('Station added successfully!');
+          e.target.reset(); // 清空表单
+          loadStations(); // 重新加载列表
+        } else {
+          alert('Error: ' + result.error);
+        }
+      });
     });
+
+    // 页面加载时
+    loadStations();
   </script>
 </body>
 </html>

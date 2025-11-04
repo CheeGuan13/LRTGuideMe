@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin – Manage Station</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <script src="scripts/i18n.js" defer></script>
+  <script src="scripts/admin_manage_station.js" defer></script>
+  
+  <style>
+    body { background: #f1f5f9; }
+    /* 地图编辑器 */
+    #editorMapCanvas {
+      position: relative; /* 关键：为了让 POI 点可以正确定位 */
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: top left;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      /* min-height: 540px; */ /* 改为由 JS 控制 */
+      cursor: crosshair; /* 提示管理员可以点击 */
+      overflow: hidden; /* 确保 POI 不会溢出 */
+      background-color: #fff;
+    }
+    /* POI 点的样式 */
+    .editor-poi {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: red;
+      border: 2px solid white;
+      transform: translate(-50%, -50%); /* 让中心点对准坐标 */
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .editor-poi:hover {
+      transform: translate(-50%, -50%) scale(1.5);
+    }
+    /* 管理员点击时显示的临时标记 */
+    #clickMarker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #2563eb;
+      border: 2px solid white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+      transform: translate(-50%, -50%);
+      pointer-events: none; /* 让它可以被穿透点击 */
+      display: none; /* 默认隐藏 */
+    }
+    /* POI 列表样式 */
+    #poiList ul { list-style: none; padding-left: 0; }
+    #poiList li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px; border-radius: 6px;
+    }
+    #poiList li:nth-child(odd) { background: #f8fafc; }
+    #poiList .delete-btn {
+      background: #ef4444; color: white; border: none;
+      border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;
+    }
+    /* 修复 input 样式 */
+    .panel input[type="text"], .panel input[type="file"], .panel select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu">
+      <a href="admin_dashboard.html" class="btn small">← Back to Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 id="stationNameTitle">Loading Station...</h1>
+
+    <div id="levelTabs" class="picker" style="margin-bottom: 20px;">
+      <p>Loading levels...</p>
+    </div>
+
+    <section class="grid two-column">
+      
+      <div class="panel" style="grid-column: span 8;">
+        <h2 id="levelNameTitle">Edit Level:</h2>
+        
+        <div id="editorMapCanvas">
+          <div id="clickMarker"></div> </div>
+        <p class="micro" style="text-align: center;">Click on the map above to get coordinates</p>
+      </div>
+
+      <aside style="grid-column: span 4; display: flex; flex-direction: column; gap: 20px;">
+
+        <div class="panel">
+          <h2>Add New POI</h2>
+          <form id="poiForm" style="display:flex; flex-direction:column; gap:10px;">
+            <input type="hidden" id="station_id" name="station_id">
+            <input type="hidden" id="level_id" name="level_id">
+            <input type="hidden" id="x_coord" name="x_coord">
+            <input type="hidden" id="y_coord" name="y_coord">
+            
+            <label for="poi_name">Name:</label>
+            <input type="text" id="poi_name" name="name" required>
+            
+            <label for="poi_id_string">Unique ID:</label>
+            <input type="text" id="poi_id_string" name="poi_id_string" placeholder="e.g., l1-toilet-main" required>
+
+            <label for="poi_type">Type:</label>
+            <select id="poi_type" name="type">
+              <option value="service">Service</option>
+              <option value="ticket">Ticket</option>
+              <option value="toilet">Toilet</option>
+              <option value="elevator">Elevator</option>
+              <option value="escalator">Escalator</option>
+              <option value="retail">Retail</option>
+              <option value="exit">Exit</option>
+              <option value="prayer">Prayer</option>
+              <option value="accessible">Accessible</option>
+              <option value="platform">Platform</option>
+            </select>
+            
+            <p style="font-size: 14px;">Coordinates: <strong id="coordDisplay">Click map...</strong></p>
+            <button type="submit" class="btn primary">Save POI</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Existing POIs on this Level</h2>
+          <div id="poiList" style="max-height: 200px; overflow-y: auto;">
+            <ul></ul>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Manage Floor Plan</h2>
+          <form id="floorplanUploader" enctype="multipart/form-data">
+            <label for="floorplanFile">Upload new floor plan image:</label>
+            <input type="file" id="floorplanFile" name="floorplan" accept="image/*">
+            <button type="submit" class="btn small" style="margin-top: 10px;">Upload</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Manage Levels</h2>
+          <form id="addLevelForm">
+            <label for="newLevelName">Add new level name (e.g., L3):</label>
+            <input type="text" id="newLevelName" name="level_name" required>
+            <button type="submit" class="btn small" style="margin-top: 10px;">Add Level</button>
+          </form>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

@@ -217,15 +217,35 @@ function getNearbyPois(poi, lv, limit=4, radius=180){
   return list;
 }
 
+// =================================================================
+// 【【【 【【【 新增的 Helper Function 】】】 】】】
+// =================================================================
+/**
+ * 在所有楼层中查找一个 POI。
+ * @param {string} poiId - 要查找的 POI ID
+ * @returns {Object|null} { poi: Object, levelKey: string }
+ */
+function findPoiInAnyLevel(poiId) {
+  const station = STATION_MAPS[currentStation];
+  if (!station || !poiId) return null;
+  for (const lvKey of Object.keys(station.levels || {})) {
+    // 确保从 __originalPois 查找，以防 POI 被过滤器隐藏
+    const arr = (station.levels[lvKey].__originalPois || station.levels[lvKey].pois) || [];
+    const found = arr.find(p => p.id === poiId);
+    if (found) {
+      return { poi: found, levelKey: lvKey };
+    }
+  }
+  return null;
+}
+// =================================================================
+
 /* ---------- 简易路径计算 ---------- */
 // 为简单原型定义各楼层走廊的 y 坐标。后续可从 STATION_MAPS.corridors 推断。
 const CORRIDOR_Y = {
   L1: [265, 415],
   L2: [175, 345]
 };
-
-// DELETED: Removed conflicting CROSS_PAIRS array.
-// The script will now use STATION_MAPS[currentStation].crossLinks from kl-sentral-map.js
 
 // 将楼层键转换为人类可读名称。用于方向文本。
 function levelKeyToName(lv) {
@@ -246,10 +266,18 @@ function levelKeyToName(lv) {
  * @returns {Object|null} { startPath: Array<{x,y}>, destPath: Array<{x,y}>, connType: string }
  */
 function computeCrossLevelRoute(start, end, startLevel, destLevel, routeType) {
-  // 过滤出从起始层到目标层的所有连通对
-  // 确保读取 kl-sentral-map.js 中定义的 crossLinks
   const allPairs = (STATION_MAPS[currentStation] || {}).crossLinks || [];
-  const levelCandidates = allPairs.filter(p => p.from.level === startLevel && p.to.level === destLevel);
+  
+  // =================================================================
+  // 【【【 【【【 这 是 跨 层 导 航 修 复 】】】 】】】
+  // =================================================================
+  // 错误：旧代码只检查 L1->L2
+  // 修复：新代码检查 L1->L2 和 L2->L1 (双向)
+  const levelCandidates = allPairs.filter(p => 
+    (p.from.level === startLevel && p.to.level === destLevel) ||
+    (p.from.level === destLevel && p.to.level === startLevel) // <-- 新增反向检查
+  );
+  // =================================================================
 
   if (!levelCandidates.length) return null; // 没有任何跨层连接
 
@@ -272,29 +300,40 @@ function computeCrossLevelRoute(start, end, startLevel, destLevel, routeType) {
   let best = null;
   // 遍历每种候选的跨层连接组合
   for (const pair of candidates) {
-    // 找出跨层的起始点与目标点的坐标
-    const fromPoiId = pair.from.poi;
-    const toPoiId   = pair.to.poi;
     
-    // 在 STATION_MAPS 中查找对应的 POI 对象
-    const startLevelObj = STATION_MAPS[currentStation]?.levels?.[startLevel];
-    const destLevelObj  = STATION_MAPS[currentStation]?.levels?.[destLevel];
-    if (!startLevelObj || !destLevelObj) continue;
+    // =================================================================
+    // 【【【 【【【 这 是 跨 层 导 航 修 复 (第2部分) 】】】 】】】
+    // =================================================================
+    // 找出连接点 POI
+    const fromLevelObj = STATION_MAPS[currentStation]?.levels?.[pair.from.level];
+    const toLevelObj   = STATION_MAPS[currentStation]?.levels?.[pair.to.level];
+    if (!fromLevelObj || !toLevelObj) continue;
 
-    // 确保我们从原始 POI 列表中查找（防止 POI 被过滤器隐藏）
-    // (如果 __originalPois 不存在，则回退到 lv.pois)
-    const startPois = (startLevelObj.__originalPois || startLevelObj.pois) || [];
-    const destPois = (destLevelObj.__originalPois || destLevelObj.pois) || [];
+    const fromPois = (fromLevelObj.__originalPois || fromLevelObj.pois) || [];
+    const toPois = (toLevelObj.__originalPois || toLevelObj.pois) || [];
 
-    const fromPoi = startPois.find(p => p.id === fromPoiId);
-    const toPoi   = destPois.find(p => p.id === toPoiId);
+    const connFromPoi = fromPois.find(p => p.id === pair.from.poi); // "From" 连接点 (例如 L1-Escalator)
+    const connToPoi   = toPois.find(p => p.id === pair.to.poi);     // "To" 连接点 (例如 L2-Escalator)
     
-    if (!fromPoi || !toPoi) continue;
+    if (!connFromPoi || !connToPoi) continue;
+    
+    let routeStart, routeEnd;
 
-    // 计算起点到跨层入口的路线
-    const routeStart = computeSimpleRoute(start, fromPoi, startLevel);
-    // 计算跨层出口到终点的路线
-    const routeEnd   = computeSimpleRoute(toPoi, end, destLevel);
+    if (pair.from.level === startLevel) {
+        // 方向正确: L1 -> L2
+        // routeStart: 你的起点 (L1) -> 连接点From (L1)
+        // routeEnd:   连接点To (L2) -> 你的终点 (L2)
+        routeStart = computeSimpleRoute(start, connFromPoi, startLevel);
+        routeEnd   = computeSimpleRoute(connToPoi, end, destLevel);
+    } else {
+        // 方向相反: L2 -> L1
+        // routeStart: 你的起点 (L2) -> 连接点To (L2)
+        // routeEnd:   连接点From (L1) -> 你的终点 (L1)
+        routeStart = computeSimpleRoute(start, connToPoi, startLevel);
+        routeEnd   = computeSimpleRoute(connFromPoi, end, destLevel);
+    }
+    // =================================================================
+    
     // 估算总距离作为代价
     const lenStart = routeLength(routeStart);
     const lenEnd   = routeLength(routeEnd);
@@ -441,59 +480,77 @@ function assertStationDataOrShowError() {
   return true;
 }
 
+// =================================================================
+// 【【【 【【【 已修复：populateImAtOptions (保留起点) 】】】 】】】
+// =================================================================
 /* --- 填充 “I am at” 下拉（当前层的 POI） --- */
 function populateImAtOptions(){
-  // 优先查找导航页面中用于表示“我在这里”的下拉框。顺序：#startSel → #imAtSelect → #startSelect → data-role → 根据 label 文本匹配。
-  const select =
-    document.querySelector('#startSel') ||
-    document.querySelector('#imAtSelect') ||
-    document.querySelector('#startSelect') ||
-    document.querySelector('select[data-role="im-at"]') ||
-    (() => {
-      const labels = Array.from(document.querySelectorAll('label'));
-      const targetLabel = labels.find(l => /i\s*am\s*at/i.test(l.textContent || ''));
-      if (targetLabel) {
-        const sel = targetLabel.parentElement?.querySelector('select');
-        if (sel) return sel;
-      }
-      return document.querySelector('main select, .content select, select');
-    })();
+  const select = document.querySelector('#startSel');
   if (!select) return;
 
   const ctx = getCurrentLevelObj();
   if (!ctx) return;
-  const { lv } = ctx;
+  const { lv, levelKey: currentLvKey } = ctx; // 获取当前楼层的 Key
   const pois = Array.isArray(lv.pois) ? lv.pois : [];
 
-  const opts = ['<option value="">-- Select location --</option>']
-    .concat(pois.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''))
-      .map(p => `<option value="${p.id}">${p.name}</option>`))
-    .join('');
+  // 1. 始终包含默认选项
+  const opts = ['<option value="">-- Select location --</option>'];
 
-  if (select.__lastOptionsHTML !== opts) {
-    select.innerHTML = opts;
-    select.__lastOptionsHTML = opts;
+  // 2. 添加当前可见楼层的所有 POI
+  opts.push(...pois.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''))
+    .map(p => `<option value="${p.id}">${p.name}</option>`));
+
+  let valueToSet = ''; // 最终要设置给 select.value 的值
+
+  // 3. 检查全局保存的起点 (currentStartPoiId)
+  if (currentStartPoiId) {
+    // 检查起点是否就在这个楼层
+    const isStartOnThisLevel = pois.some(p => p.id === currentStartPoiId);
+
+    if (isStartOnThisLevel) {
+      // 起点就在这个楼层, 正常设置 value
+      valueToSet = currentStartPoiId;
+    } else {
+      // 起点在 *另一个* 楼层
+      const startPoiData = findPoiInAnyLevel(currentStartPoiId);
+      if (startPoiData) {
+        // 找到起点了, 添加一个禁用的“占位”选项来显示它
+        const startLevelName = levelKeyToName(startPoiData.levelKey);
+        // (使用 i18n 翻译 'on')
+        const onText = (window.translations?.[window.currentLang]?.on_level) || 'on';
+        
+        opts.push(`<option value="${currentStartPoiId}" disabled selected style="color:#2563eb; font-weight:bold;">
+                     ${startPoiData.poi.name} [${onText} ${startLevelName}]
+                   </option>`);
+        valueToSet = currentStartPoiId; // 告诉 select 选中这个禁用的项
+      }
+    }
   }
 
-  // 如果当前选择的起点不在此楼层，则仍保留它供跨层导航使用，但不在下拉框中显示
-  if (!pois.some(p => p.id === currentStartPoiId)) {
-    // 起点位于其他楼层，保留 currentStartPoiId
-    // 清空下拉框显示值
-    if (select.value !== '') select.value = '';
+  // 4. 渲染 HTML
+  const optsHTML = opts.join('');
+  if (select.__lastOptionsHTML !== optsHTML) {
+    select.innerHTML = optsHTML;
+    select.__lastOptionsHTML = optsHTML;
   }
+  
+  // 5. 设置下拉框的选中值
+  select.value = valueToSet;
 
-  // 绑定下拉变化事件，仅绑定一次
+  // 6. 绑定事件 (只绑定一次)
   if (!select.__imAtListenerAttached) {
     select.addEventListener('change', (e) => {
       const val = e.target.value;
       currentStartPoiId = val || null;
-      // 记录起点所属楼层，便于跨层导航
-      const ctx2 = getCurrentLevelObj();
-      if (currentStartPoiId && ctx2) {
-        currentStartLevel = ctx2.levelKey;
+      
+      // 记录起点所属楼层
+      const startPoiData = findPoiInAnyLevel(currentStartPoiId);
+      if (startPoiData) {
+        currentStartLevel = startPoiData.levelKey;
       } else {
         currentStartLevel = null;
       }
+      
       // 用户变更起点时，清除现有动态路径
       dynamicRoutes = {};
       dynamicRouteEl = null;
@@ -503,6 +560,8 @@ function populateImAtOptions(){
     select.__imAtListenerAttached = true;
   }
 }
+// =================================================================
+
 
 function renderMap(){
   // 【【【 优化点 2：新增 】】】
@@ -665,29 +724,33 @@ function renderMap(){
   mapCanvas.appendChild(svg);
   
   // =================================================================
-  // 【【【 优化点 4：新增 】】】
+  // 【【【 【【【 这 是 修 复 V3 (最终版) 】】】 】】】
   //
-  //   使用 svg-pan-zoom 库激活这个 SVG
+  //   我们不再依赖 `fit: true` 选项, 而是手动调用 .fit()
   //
-  // 确保在激活前 SVG 已经完全渲染并有尺寸
+  // =================================================================
   setTimeout(() => {
     // 检查 svg 是否还在DOM中 (防止用户在0.1秒内切换了楼层)
     if (document.getElementById("mapCanvas")?.contains(svg)) { 
       currentPanZoomInstance = svgPanZoom(svg, {
-        panEnabled: true,            // 允许平移
-        zoomEnabled: true,           // 允许缩放 (包括鼠标滚轮和双指缩放)
-        controlIconsEnabled: false,  // 不显示 +/- 按钮 (保持界面干净)
-        fit: true,                   // 初始加载时自动适应容器
-        center: true,                // 初始加载时居中
-        minZoom: 0.7,                // 最小缩放级别 (允许缩小一点)
-        maxZoom: 5,                  // 最大缩放级别 (允许放大5倍)
-        zoomScaleSensitivity: 0.3,   // 缩放灵敏度
-        
-        // [重要] 防止库和你的POI点击事件冲突
+        panEnabled: true,
+        zoomEnabled: true,
+        controlIconsEnabled: false,
+        // fit: true,      // <-- 【删除】
+        // center: true,   // <-- 【删除】
+        minZoom: 0.7,
+        maxZoom: 5,
+        zoomScaleSensitivity: 0.3,
         preventMouseEventsDefault: false 
       });
+
+      // 【【【 新增 】】】
+      // 在创建实例后，手动调用 fit 和 center
+      // 这样做更可靠，因为它会强制库重新检查容器尺寸
+      currentPanZoomInstance.fit();
+      currentPanZoomInstance.center();
     }
-  }, 100); // 延迟 100毫秒
+  }, 100); // 100ms 延迟仍然是好的，以等待 flexbox 稳定
   // =================================================================
 
 } // 这是 renderMap() 函数的结束括号
@@ -739,23 +802,11 @@ async function calculateAndDrawRoute() {
   }
 
   // 3. 查找起点 POI 完整对象 (支持跨层)
-  const station = STATION_MAPS[currentStation];
-  if (!station) return;
-  let startPoi = null;
-  let startLvKey = null;
-  for (const lvKey of Object.keys(station.levels || {})) {
-    // 【【【 修复：使用 __originalPois 】】】
-    const arr = (station.levels[lvKey].__originalPois || station.levels[lvKey].pois) || [];
-    const found = arr.find(p => p.id === currentStartPoiId);
-    if (found) {
-      startPoi = found;
-      startLvKey = lvKey;
-      break;
-    }
-  }
+  // 【【【 修复：使用新的 helper function 】】】
+  const startPoiData = findPoiInAnyLevel(currentStartPoiId);
 
   // 4. 检查起点是否有效
-  if (!startPoi || !startLvKey) {
+  if (!startPoiData) {
     {
       const lang = window.currentLang || 'en';
       const tDict = (window.translations && window.translations[lang]) || {};
@@ -764,6 +815,9 @@ async function calculateAndDrawRoute() {
     }
     return;
   }
+
+  const startPoi = startPoiData.poi;
+  const startLvKey = startPoiData.levelKey;
 
   // 5. 获取终点 POI 和楼层
   const ctx = getCurrentLevelObj();
@@ -869,7 +923,7 @@ function bindUI(){
     const g = findBtnByText(lvlScope, 'Ground Floor');
     const p = findBtnByText(lvlScope, 'Platform Level');
     if (g) g.dataset.level = 'L1';
-    if (p) g.dataset.level = 'L2';
+    if (p) p.dataset.level = 'L2'; // <-- 【【【 修复 V3 】】】
     levelBtns = [g,p].filter(Boolean);
   }
   lvlScope.addEventListener('click', (e)=>{
@@ -895,16 +949,16 @@ function bindUI(){
   ensureNavBtn('Accessible Route','accessible');
 
   navScope.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-route]');
-    if (!btn) return;
-    const type = btn.dataset.route;
+    const btn = e.target.closest('[data-route]'); // <-- 【【【 修复 V3 】】】
+    if (!btn) return;
+    const type = btn.dataset.route;
 
     // 如果点击的已经是当前激活的类型，则不执行任何操作
     if (selectedRouteType === type && btn.classList.contains('active')) return;
-    
-    selectedRouteType = type;
-    setActive([...navScope.querySelectorAll('[data-route]')], btn);
-    
+    
+    selectedRouteType = type;
+    setActive([...navScope.querySelectorAll('[data-route]')], btn);
+    
     // === 核心修改 ===
     // 检查是否已经有起点和终点 (即路线正在显示中)
     if (currentStartPoiId && currentSelectedPoi) {
@@ -916,7 +970,7 @@ function bindUI(){
       dynamicRoutes = {};
       rerender(); 
     }
-  });
+  });
 
   /* 过滤器 */
   document.querySelectorAll('.type-filter').forEach(cb=>{
@@ -928,107 +982,132 @@ function bindUI(){
   if (changeBtn) changeBtn.addEventListener('click', ()=>{ window.location.href = 'station-select.html'; });
 
   /* 窗口调整 → 重绘 */
+  // =================================================================
+  // 【【【 【【【 这 是 终 极 修 复 】】】 】】】
+  // =================================================================
   let resizeTimer = null;
   window.addEventListener('resize', ()=>{
-    clearTimeout(resizeTimer);
+    clearTimeout(resizeTimer); // 清除旧的计时器
     
-    // 【【【 优化点 5：修改 】】】
-    // 窗口调整大小时，让 pan-zoom 实例也刷新
-    if (currentPanZoomInstance) {
-      currentPanZoomInstance.resize();
-      currentPanZoomInstance.center();
-    }
-    // (不再使用 rerender, 因为它在缩放时体验不好)
-    // resizeTimer = setTimeout(rerender, 120);
+    // 设置一个新的计时器
+    resizeTimer = setTimeout(() => {
+      if (currentPanZoomInstance) {
+        currentPanZoomInstance.resize(); // 1. 告诉库容器大小变了
+        currentPanZoomInstance.fit();     // 2. 告诉库重新适应内容
+        currentPanZoomInstance.center();  // 3. 告诉库居中
+      }
+    }, 150); // 150毫秒延迟，等待 resize 风暴结束
   });
+  // =================================================================
+  
+  // =================================================================
+  // 【【【 【【【 新增：修复地图缩放导致页面滚动的问题 】】】 】】】
+  // =================================================================
+  if (mapCanvas) {
+    mapCanvas.addEventListener('wheel', (event) => {
+      // 当鼠标在地图上滚动时，阻止页面的默认滚动行为
+      event.preventDefault();
+    }, { passive: false }); // 明确告诉浏览器我们会调用 preventDefault
+  }
+  // =================================================================
+
 }
 
 /* ---------- 初始化 ---------- */
+// =================================================================
+// 【【【 【【【 这 是 核 心 修 改 (V2 - 数据库版) 】】】 】】】
+// =================================================================
 document.addEventListener('DOMContentLoaded', ()=>{
   // 1) 站点检查
-  // 如果尚未选择站点，则默认加载 “KL Sentral” 以便展示示例地图。
   if (!currentStation) {
     currentStation = 'KL Sentral';
     localStorage.setItem('currentStation', currentStation);
   }
   
-  // 确保在访问 STATION_MAPS 之前，原始 POI 列表被备份
-  if (STATION_MAPS[currentStation] && STATION_MAPS[currentStation].levels) {
-    Object.values(STATION_MAPS[currentStation].levels).forEach(lv => {
-      if (Array.isArray(lv.pois) && !lv.__originalPois) {
-        lv.__originalPois = lv.pois.slice();
+  // 2) 去 API 获取数据，而不是依赖 kl-sentral-map.js
+  fetch(`get_map_data.php?station=${encodeURIComponent(currentStation)}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      return response.json();
+    })
+    .then(data => {
+      // 将获取的数据存入全局变量，后续代码可以像以前一样运行
+      window.STATION_MAPS = data; 
+      
+      // 3) 确保在访问 STATION_MAPS 之前，原始 POI 列表被备份
+      if (STATION_MAPS[currentStation] && STATION_MAPS[currentStation].levels) {
+        Object.values(STATION_MAPS[currentStation].levels).forEach(lv => {
+          if (Array.isArray(lv.pois) && !lv.__originalPois) {
+            lv.__originalPois = lv.pois.slice();
+          }
+        });
+      }
+
+      // 4) 检查地图数据是否存在
+      if (!STATION_MAPS[currentStation]) {
+        const lang = localStorage.getItem('preferredLang') || 'en';
+        let msg = 'Map coming soon...';
+        try {
+          if (typeof translations === 'object' && translations[lang] && translations[lang].map_coming_soon) {
+            msg = translations[lang].map_coming_soon;
+          }
+        } catch (e) { /* use default */ }
+        
+        if (mapCanvas) {
+          mapCanvas.innerHTML = '';
+          const msgEl = document.createElement('div');
+          msgEl.className = 'panel';
+          msgEl.style.textAlign = 'center';
+          msgEl.style.color = '#ef4444';
+          const enText = (typeof translations === 'object' && translations['en'] && translations['en'].map_coming_soon)
+            ? translations['en'].map_coming_soon
+            : 'Map coming soon...';
+          msgEl.textContent = enText;
+          msgEl.setAttribute('data-i18n-key', 'map_coming_soon');
+          mapCanvas.appendChild(msgEl);
+          if (typeof applyTranslations === 'function') {
+            applyTranslations(lang);
+          }
+        }
+        const lbl = document.getElementById('currentStationLabel');
+        if (lbl) {
+          const prefix = (translations[lang] && translations[lang].current_station_prefix) || 'Current Station: ';
+          lbl.textContent = `${prefix}${currentStation}`;
+        }
+        return; // 停止执行，因为没有地图
+      }
+
+      // 5) 同步/修正楼层（无值则用默认层）
+      const stationObj = STATION_MAPS[currentStation];
+      if (!currentLevel || !(stationObj.levels || {})[currentLevel]) {
+        currentLevel = normalizeLevelKey(stationObj.defaultLevel) || Object.keys(stationObj.levels || {})[0];
+        localStorage.setItem('currentLevel', currentLevel);
+      }
+
+      // 6) 首次渲染
+      rerender();
+
+      // 7) 根据当前状态恢复按钮高亮
+      const lvlScope = document.querySelector('.station-levels') || document;
+      const curLvlBtn = lvlScope.querySelector(`[data-level="${currentLevel}"]`)
+                      || findBtnByText(lvlScope, currentLevel === 'L2' ? 'Platform Level' : 'Ground Floor');
+      if (curLvlBtn) setActive([...lvlScope.querySelectorAll('[data-level]')], curLvlBtn);
+
+      // 8) 恢复默认路线类型的高亮
+      if (selectedRouteType) {
+        const navScope = document.querySelector('.navigation-type') || document;
+        const curRouteBtn = navScope.querySelector(`[data-route="${selectedRouteType}"]`);
+        if (curRouteBtn) setActive([...navScope.querySelectorAll('[data-route]')], curRouteBtn);
+      }
+
+      // 9) 绑定事件
+      bindUI();
+      
+    })
+    .catch(error => {
+      console.error('Error fetching map data:', error);
+      mapCanvas.innerHTML = `<div class="panel" style="text-align:center;color:#ef4444">⚠️ Failed to load map data. Please check connection or API.</div>`;
     });
-  }
-
-  // If the selected station has no map data, display a "coming soon" message instead of
-  // falling back to another map. We use the translation dictionary to show the
-  // message in the current language. After showing the message, we stop further
-  // initialization so the rest of the navigation UI does not attempt to render.
-  if (!STATION_MAPS[currentStation]) {
-    const lang = localStorage.getItem('preferredLang') || 'en';
-    let msg = 'Map coming soon...';
-    try {
-      if (typeof translations === 'object' && translations[lang] && translations[lang].map_coming_soon) {
-        msg = translations[lang].map_coming_soon;
-      }
-    } catch (e) {
-      // use default
-    }
-    // Show message in the map canvas area. Create an element with a data-i18n-key so
-    // that it will update when the language changes via applyTranslations().
-    if (mapCanvas) {
-      // Clear existing content
-      mapCanvas.innerHTML = '';
-      const msgEl = document.createElement('div');
-      msgEl.className = 'panel';
-      msgEl.style.textAlign = 'center';
-      msgEl.style.color = '#ef4444';
-      // Set English text as the default/original content. This ensures that
-      // when lang === 'en', applyTranslations will keep the original text.
-      const enText = (typeof translations === 'object' && translations['en'] && translations['en'].map_coming_soon)
-        ? translations['en'].map_coming_soon
-        : 'Map coming soon...';
-      msgEl.textContent = enText;
-      msgEl.setAttribute('data-i18n-key', 'map_coming_soon');
-      mapCanvas.appendChild(msgEl);
-      // Immediately translate the message to the current language
-      if (typeof applyTranslations === 'function') {
-        applyTranslations(lang);
-      }
-    }
-    // Update station label to reflect the selected station
-    const lbl = document.getElementById('currentStationLabel');
-    if (lbl) {
-      const prefix = (translations[lang] && translations[lang].current_station_prefix) || 'Current Station: ';
-      lbl.textContent = `${prefix}${currentStation}`;
-    }
-    return;
-  }
-
-  // 2) 同步/修正楼层（无值则用默认层）
-  const stationObj = STATION_MAPS[currentStation];
-  if (!currentLevel || !(stationObj.levels || {})[currentLevel]) {
-    currentLevel = normalizeLevelKey(stationObj.defaultLevel) || Object.keys(stationObj.levels || {})[0];
-    localStorage.setItem('currentLevel', currentLevel);
-  }
-
-  // 3) 首次渲染
-  rerender();
-
-  // 4) 根据当前状态恢复按钮高亮
-  const lvlScope = document.querySelector('.station-levels') || document;
-  const curLvlBtn = lvlScope.querySelector(`[data-level="${currentLevel}"]`)
-                  || findBtnByText(lvlScope, currentLevel === 'L2' ? 'Platform Level' : 'Ground Floor');
-  if (curLvlBtn) setActive([...lvlScope.querySelectorAll('[data-level]')], curLvlBtn);
-
-  // MODIFIED: Always highlight the default selected route type on load
-  if (selectedRouteType) {
-    const navScope = document.querySelector('.navigation-type') || document;
-    const curRouteBtn = navScope.querySelector(`[data-route="${selectedRouteType}"]`);
-    if (curRouteBtn) setActive([...navScope.querySelectorAll('[data-route]')], curRouteBtn);
-  }
-
-  // 5) 绑定事件
-  bindUI();
 });
