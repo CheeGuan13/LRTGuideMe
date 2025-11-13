@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <title data-i18n-key="ar_view_mockup_title">LRT GuideMe – AR Mock-up</title>
+  
+  <link rel="stylesheet" href="styles/style.css" />
+  
+  <script src="scripts/i18n.js" defer></script>
+  
+  <script src="scripts/ar_mockup.js" defer></script>
+  
+</head>
+<body>
+  
+  <header class="container nav">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="assets/images/LRT-Icon.png" alt="LRT Icon" />
+      <span class="notranslate">LRT GuideMe</span>
+    </a>
+    <nav class="menu" style="display:flex;align-items:center;gap:12px;">
+      <select id="langSelect" aria-label="Select language" style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="zh">中文</option>
+      </select>
+      <div id="userArea">
+      <a href="login.html" class="btn" data-i18n-key="login_btn"
+        style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;
+         font-size:16px;font-family:inherit;font-weight:normal;line-height:normal;color:black">Login
+      </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+  
+    <a href="navigation.html" class="btn small" style="margin-bottom: 15px;" data-i18n-key="back">← Back</a>
+
+    <h1 class="page-title" data-i18n-key="ar_view_mockup" style="margin-top:0;">AR View (Mock-up)</h1>
+    
+    <p id="step-counter" class="page-sub" style="text-align:center; font-weight:bold;"></p>
+    
+    <div class="ar-container">
+      <img src="" alt="Station View" 
+           id="station-background"
+           class="station-background">
+           
+      <img src="" alt="Navigation Arrow"
+           id="overlay-arrow"
+           class="overlay-arrow">
+    </div>
+    
+    <p id="step-text" style="text-align:center; font-size: 1.1em; margin-top: 15px;"></p>
+
+    <div class="ar-controls">
+        <button id="prev-step" class="btn primary">← <span data-i18n-key="ar_prev_step">Prev</span></button>
+        <button id="next-step" class="btn primary"><span data-i18n-key="ar_next_step">Next</span> →</button>
+    </div>
+    
+  </main>
+  
+  <footer class="container footer">© 2025 LRT GuideMe</footer>
+  
+  <script>
+    window.isUserLoggedIn = false; 
+    const userArea_ar = document.getElementById('userArea'); 
+    
+    fetch('session_check.php')
+      .then(response => response.json())
+      .then(data => {
+        window.isUserLoggedIn = data.logged_in; 
+        if (data.logged_in) {
+          userArea_ar.innerHTML = `
+            <div id="userMenu" style="position:relative;">
+              <img id="userAvatarIcon" src="${data.avatar || 'assets/images/user-icon.png'}" alt="User Avatar"
+                   style="width:36px;height:36px;border-radius:50%;cursor:pointer;border:1px solid #ccc;">
+            </div>
+          `;
+          document.querySelector('#userMenu img').addEventListener('click', () => {
+            window.location.href = 'user.html';
+          });
+        } else {
+          alert('Please log in to view this page.');
+          window.location.href = 'login.html';
+        }
+      })
+      .catch(err => {
+          console.error('Session check failed:', err);
+          alert('Session check failed. Please log in.');
+          window.location.href = 'login.html';
+      });
+  </script>
+
+</body>
+</html>

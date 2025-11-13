@@ -470,3 +470,64 @@ html, body {
   background-color: #b91c1c; 
   border-color: #b91c1c;
 }
+/* --- AR Mock-up Styles (Carousel Version) --- */
+/* 这是实现叠加效果的关键 */
+
+.ar-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  /* 保持 16:9 的宽高比 */
+  aspect-ratio: 16 / 9; 
+  background-color: #f0f0f0;
+}
+
+.ar-container .station-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 确保图片填满容器，不变形 */
+  display: block;
+  /* 添加平滑过渡效果 */
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.ar-container .overlay-arrow {
+  position: absolute;
+  width: 25%;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 1;
+  /* 添加平滑过渡效果 */
+  transition: opacity 0.3s ease-in-out;
+  
+  /* 添加一点阴影让箭头更突出 */
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+
+/* 步骤控制按钮 */
+.ar-controls {
+  display: flex;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 20px auto 0 auto;
+}
+
+.ar-controls .btn {
+  min-width: 120px;
+  text-align: center;
+}
+
+/* 禁用按钮的样式 */
+.ar-controls .btn:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
