@@ -14,6 +14,12 @@ const translations = {
     back: '← Back',
     login_btn: 'Login',
 
+    // --- AR Mock-up Page ---
+    ar_view_mockup_title: "LRT GuideMe - AR Mock-up",
+    ar_demo_desc: "This is a simulation of the AR view, showing the path from your location.",
+    ar_prev_step: "Prev",
+    ar_next_step: "Next",
+
     // --- Login Page ---
     login_title: 'Login to LRT GuideMe',
     username_label: 'Username',
@@ -34,7 +40,7 @@ const translations = {
     login_here: 'Login here',
 
     // --- User Page ---
-    user_page_title: 'LRT GuideMe – User Profile',
+    user_page_title: 'LRT GuideMe - User Profile',
     welcome_prefix: 'Welcome, ',
     logged_in_status: 'You are logged in to LRT GuideMe.',
     logout_button: 'Logout',
@@ -140,7 +146,7 @@ const translations = {
     delete_error_password: 'Password incorrect. Account not deleted.',
     
     // --- 【【 翻译添加在这里 】】 ---
-    edit_profile_title: 'LRT GuideMe – Edit Profile',
+    edit_profile_title: 'LRT GuideMe - Edit Profile',
     edit_profile_button:'Edit',
     edit_profile_heading: 'Edit Your Profile',
     edit_profile_description: 'Update your username, email, or password below.',
@@ -182,6 +188,12 @@ const translations = {
     back: '← Balik',
     login_btn: 'Log Masuk',
 
+    // --- AR Mock-up Page ---
+    ar_view_mockup_title: "LRT GuideMe - Simulasi AR",
+    ar_demo_desc: "Ini adalah simulasi paparan AR, menunjukkan laluan dari lokasi anda.",
+    ar_prev_step: "Sebelum",
+    ar_next_step: "Seterus",
+
     // --- Login Page ---
     login_title: 'Log Masuk ke LRT GuideMe',
     username_label: 'Nama Pengguna',
@@ -202,7 +214,7 @@ const translations = {
     login_here: 'Log masuk di sini',
 
     // --- User Page ---
-    user_page_title: 'LRT GuideMe – Profil Pengguna',
+    user_page_title: 'LRT GuideMe - Profil Pengguna',
     welcome_prefix: 'Selamat datang, ',
     logged_in_status: 'Anda telah log masuk ke LRT GuideMe.',
     logout_button: 'Log Keluar',
@@ -349,6 +361,12 @@ const translations = {
     view_details: '查看详情',
     back: '← 返回',
     login_btn: '登录',
+
+    // --- AR Mock-up Page ---
+    ar_view_mockup_title: "LRT GuideMe - AR 模拟",
+    ar_demo_desc: "这是一个 AR 视图模拟，显示从您当前位置出发的路线。",
+    ar_prev_step: "上一步",
+    ar_next_step: "下一步",
 
     // --- Login Page ---
     login_title: '登录 LRT GuideMe',
